@@ -1,0 +1,24 @@
+{
+  "name": "{{app_name}}",
+  "version": "1.0.0",
+  "description": "{{description}}",
+  "main": "main.mjs",
+  "type": "module",
+  "scripts": {
+    "start": "electron ."
+  },
+  "keywords": ["webapp", "electron", "{{category}}"],
+  "author": "AppNix",
+  "license": "MIT",
+  "dependencies": {
+    "electron": "{{electron_version}}"
+  },
+  "build": {
+    "appId": "com.appnix.{{app_name}}",
+    "productName": "{{name}}",
+    "linux": {
+      "category": "{{category}}",
+      "icon": "{{icon}}"
+    }
+  }
+}

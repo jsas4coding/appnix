@@ -1,0 +1,11 @@
+defaults:
+  electron_version: "24.0.0"
+  lang: "en-US"
+  spellcheck:
+    - "en-US"
+apps:
+  - name: "Test App"
+    url: "https://example.com"
+    app_name: "test-app"
+    category: "Utility"
+    description: "A test application"

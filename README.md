@@ -1,273 +1,116 @@
-# Web AppImage Generator with Electron
+# AppNix 🚀
 
-## 1. Introduction
+Transform web applications into native Linux desktop applications with ease.
 
-**Web AppImage Generator** allows you to transform websites into standalone Linux desktop applications, packaged as isolated AppImages using Electron.
+## 🌟 Overview
 
-Applications run in independent windows, preserve user sessions (via `user-data`), and behave like native apps (ChatGPT, YouTube, Gmail, etc.) — without tab overload.
+AppNix is a powerful CLI tool that converts websites into Linux desktop AppImages using Electron, allowing you to turn any web app into a native desktop experience.
 
-This toolchain supports both `make` and a fallback `build.sh` script, ensuring that even environments without Make can easily build everything.
+## ✨ Features
 
-> **Note:** Tested exclusively on **Linux** distributions.
+- 🌐 Convert web apps to native Linux desktop applications
+- 🔧 Customizable app configurations
+- 🛡️ Secure Electron sandbox
+- 💻 Easy-to-use CLI interface
+- 🖥️ Seamless desktop integration
 
-## 1.1 Scope and Disclaimer
+## 🚀 Quick Start
 
-> **Important Notice**  
-> This project is an **example based on personal needs** and **should not** be considered a production-grade solution.  
-> It is provided **as-is**, without warranties, and has **no formal testing** for broader use cases.
+### Prerequisites
 
-The main purpose is similar to a **well-organized Gist**:
+- Node.js (>=22.0.0)
+- Linux operating system
 
-- To share ideas and workflows that may help others.
-- To serve as a starting point for personal adaptations.
-
-**If you choose to use it for production, you do so at your own risk.**  
-Contributions and improvements are welcome, but no production support is guaranteed.
-
----
-
-## 2. What This Project Solves
-
-- Converts websites into full desktop applications.
-- Enables isolated browsing environments.
-- Preserves user data per app.
-- Removes dependency on browser tabs.
-- Supports reproducible builds.
-
----
-
-## 3. Important Notes
-
-- **Ensure executable permissions**:
-  ```bash
-  chmod +x generate_apps.py build.sh
-  ```
-- Designed and tested on **Linux** only.
-- Node.js v22+ and Python 3.8+ required.
-
----
-
-## 4. Setup Instructions
-
-### 4.1 Requirements
-
-- Linux-based OS (Debian/Ubuntu/Arch/etc.)
-- Python >= 3.8
-- Node.js >= 22
-- npm
-- (Optional) make
-
-### 4.2 Installing Node.js
-
-#### Using nvm (recommended)
+### Installation
 
 ```bash
-curl -o- https://raw.githubusercontent.com/nvm-sh/nvm/v0.39.7/install.sh | bash
-source ~/.nvm/nvm.sh
-nvm install 22
-nvm use 22
+npm install -g appnix
 ```
 
-#### Without nvm (manual install)
+### Configuration
+
+Create a configuration file at `~/.config/appnix/config.yml`:
+
+```yaml
+defaults:
+  electron_version: '36.0.0'
+  lang: 'en-US'
+
+apps:
+  - name: 'ChatGPT'
+    url: 'https://chat.openai.com'
+    app_name: 'chatgpt'
+    category: 'Utility;AI'
+    description: 'Chat with AI'
+    icon: '/path/to/icon.png'
+    window:
+      width: 1280
+      height: 800
+```
+
+### Usage
+
+#### Build AppImage
 
 ```bash
-curl -fsSL https://deb.nodesource.com/setup_22.x | sudo -E bash -
-sudo apt install -y nodejs
+appnix build
 ```
 
-### 4.3 Installing Python + venv
+#### Install Desktop Entries
 
 ```bash
-sudo apt install python3 python3-venv python3-pip
-python3 -m venv .venv
-source .venv/bin/activate
+appnix install:desktop
 ```
 
-### 4.4 Installing make (optional)
+## 🛠️ Development Commands
 
 ```bash
-sudo apt install make
+# Build the project
+npm run build
+
+# Run tests
+npm run test
+
+# Lint code
+npm run lint
+
+# Format code
+npm run format
 ```
 
----
+## 🔒 Security
 
-## 5. Project Structure
+- Electron sandbox enabled by default
+- Strict configuration validation
+- Minimal runtime permissions
 
-```
-apps/
-├── icons/                   # PNG icons for apps
-├── build/                   # Temporary working directory
-├── opt/                     # Final AppImage install location
-├── desktop-entries/         # Generated .desktop files
-├── user-data/$USER/          # Shared userData per user
-├── apps.json                # Configuration file
-├── generate_apps.py         # Python build script
-├── build.sh                 # Alternative build script
-├── Makefile                 # Primary automation (if make installed)
-```
+## 🤝 Contributing
 
----
+1. Fork the repository
+2. Create a feature branch
+3. Commit your changes
+4. Run tests and linting
+5. Submit a pull request
 
-## 6. Usage: Building Applications
+## 📋 Compatibility
 
-### Option 1: Using Makefile (recommended)
+- Linux desktop environments
+- Web applications compatible with Electron
+- Node.js >=22.0.0
 
-```bash
-make setup         # Install Electron + Electron Builder
-make prepare       # Create necessary directories
-make build         # Generate AppImages
-make install-desktop  # Install .desktop shortcuts
-```
+## 🚧 Limitations
 
-### Option 2: Using build.sh (for minimal environments)
+- Currently Linux-only
+- Requires Chromium-compatible web applications
 
-```bash
-bash build.sh
-```
+## 📜 License
 
-This will:
+[To be determined]
 
-- Install dependencies
-- Build apps
-- Install desktop entries
+## 🙏 Acknowledgments
 
-### What Happens
+- Electron
+- Electron Builder
+- Handlebars
+- TypeScript Community
 
-- AppImages are created under `opt/{app}`.
-- `.desktop` launchers are generated.
-- Apps will appear in your system launcher (Gnome/KDE/XFCE).
-
----
-
-## 7. apps.json Format
-
-Example:
-
-```json
-[
-  {
-    "name": "Telegram",
-    "url": "http://web.telegram.org",
-    "icon": "telegram",
-    "app_name": "telegram",
-    "category": "Network;InstantMessaging",
-    "description": "Chat via Telegram Web",
-    "skip": true
-  },
-  {
-    "name": "WhatsApp",
-    "url": "https://web.whatsapp.com",
-    "icon": "whatsapp",
-    "app_name": "whatsapp",
-    "category": "Network;InstantMessaging",
-    "description": "Send and receive messages with WhatsApp Web",
-    "skip": false
-  },
-  {
-    "name": "RegEx101",
-    "url": "https://regex101.com",
-    "icon": "regex101",
-    "app_name": "regex101",
-    "category": "Development;Utility",
-    "description": "Test and debug regular expressions",
-    "skip": false
-  }
-]
-```
-
-| Field         | Description                     |
-| :------------ | :------------------------------ |
-| `name`        | Display name                    |
-| `url`         | Entry URL                       |
-| `icon`        | Icon filename (inside `icons/`) |
-| `app_name`    | AppImage executable name        |
-| `category`    | Linux app category              |
-| `description` | Tooltip / metadata description  |
-| `skip`        | Skip generation if true         |
-
----
-
-## 8. Customization
-
-### Environment Variables
-
-| Variable                            | Description                     | Default               |
-| :---------------------------------- | :------------------------------ | :-------------------- |
-| `APP_LANG`                          | Locale language for app         | `pt-BR`               |
-| `APP_SPELLCHECK_LANGS`              | Spellchecker languages          | `en-US,pt-BR`         |
-| `APP_USERDATA`                      | Path to shared user-data folder | `./user-data/$(USER)` |
-| `REQUIRED_NODE_MAJOR_VERSION`       | Node.js required major version  | `22`                  |
-| `REQUIRED_ELECTRON_VERSION`         | Electron version                | `36.0.0`              |
-| `REQUIRED_ELECTRON_BUILDER_VERSION` | Electron Builder version        | `26.0.12`             |
-
-Example overriding at build:
-
-```bash
-APP_SPELLCHECK_LANGS=en-US,es-ES make build
-```
-
-or
-
-```bash
-APP_SPELLCHECK_LANGS=en-US,es-ES bash build.sh
-```
-
----
-
-## 9. Cleaning Up
-
-```bash
-make clean
-# or manually
-rm -rf build opt desktop-entries
-```
-
-Full wipe (including user data):
-
-```bash
-make purge
-# or manually
-rm -rf build opt desktop-entries user-data
-```
-
----
-
-## 10. Troubleshooting
-
-### AppImage permission errors
-
-```bash
-chmod +x opt/chatgpt/chatgpt.AppImage
-```
-
-### Icon missing in launcher
-
-```bash
-gtk-update-icon-cache ~/.local/share/icons/hicolor
-```
-
-### Cache/quota errors from Electron
-
-Ensure your `user-data` is writable.
-
-### App won't close on Ctrl+W
-
-Apps are configured to close properly — report issues if persists.
-
----
-
-## 11. Final Notes
-
-- Project focused on **Linux** only.
-- WSL, Windows, macOS are **not supported**.
-- Full session persistence between launches.
-- Full keyboard shortcuts support (F11 fullscreen, Ctrl+W close).
-
----
-
-## 12. Credits
-
-Made for developers who want clean workflows without browser tabs.  
-Built 100% with open-source technology.
-
-MIT License — Contributions welcome!

@@ -1,0 +1,30 @@
+defaults:
+  electron_version: '36.0.0'
+  lang: 'en-US'
+  spellcheck:
+    - 'en-US'
+    - 'pt-BR'
+
+apps:
+  - name: 'Google'
+    url: 'https://www.google.com'
+    app_name: 'google'
+    category: 'Network;WebBrowser'
+    description: 'Access Google Search'
+    icon: '/app/tests/docker/icons/google.png'
+    window:
+      width: 1280
+      height: 800
+      fullscreen: false
+
+  - name: 'Wikipedia'
+    url: 'https://www.wikipedia.org'
+    app_name: 'wikipedia'
+    category: 'Education;Reference'
+    description: 'Free online encyclopedia'
+    icon: '/app/tests/docker/icons/wikipedia.png'
+    window:
+      width: 1280
+      height: 800
+      fullscreen: false
+

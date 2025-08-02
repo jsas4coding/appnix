@@ -1,0 +1,7 @@
+defaults:
+  electron_version: "24.0.0"
+  lang: "en-US"
+  spellcheck: "invalid"
+apps: []
+
+
