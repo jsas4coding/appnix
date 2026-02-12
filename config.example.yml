@@ -1,0 +1,42 @@
+defaults:
+  electron_version: "40.4.0"
+  lang: "en-US"
+  spellcheck:
+    - "en-US"
+    - "pt-BR"
+
+apps:
+  - name: "ChatGPT"
+    url: "https://chat.openai.com"
+    icon: "chatgpt"
+    app_name: "chatgpt"
+    category: "Science;ArtificialIntelligence;Chat"
+    description: "AI assistant for writing, coding and research"
+
+  - name: "Claude"
+    url: "https://claude.ai"
+    icon: "claude"
+    app_name: "claude"
+    category: "Science;ArtificialIntelligence;Chat"
+    description: "AI assistant for analysis, writing and coding"
+
+  - name: "YouTube"
+    url: "https://www.youtube.com"
+    icon: "youtube"
+    app_name: "youtube"
+    category: "AudioVideo;Video;Player"
+    description: "Watch videos, music and live streams"
+
+  - name: "Gmail"
+    url: "https://mail.google.com"
+    icon: "gmail"
+    app_name: "gmail"
+    category: "Office;Network;Email"
+    description: "Email, contacts and calendar integration"
+
+  - name: "WhatsApp"
+    url: "https://web.whatsapp.com"
+    icon: "whatsapp"
+    app_name: "whatsapp"
+    category: "Network;InstantMessaging;Chat"
+    description: "Messaging, voice and video calls"

@@ -1,0 +1,137 @@
+import { app, BrowserWindow, Menu, shell } from 'electron';
+
+app.commandLine.appendSwitch('no-sandbox');
+
+const gotLock = app.requestSingleInstanceLock();
+if (!gotLock) {
+  app.quit();
+}
+
+const APP_URL = '{{url}}';
+const APP_ORIGIN = new URL(APP_URL).origin;
+
+function createWindow() {
+  const win = new BrowserWindow({
+    width: 1280,
+    height: 800,
+    webPreferences: {
+      contextIsolation: true,
+      nodeIntegration: false,
+      sandbox: true,
+      webviewTag: false
+    }
+  });
+
+  win.webContents.setUserAgent(
+    win.webContents.getUserAgent()
+      .replace(/\s*{{app_name}}\/[\w.-]+/, '')
+      .replace(/\s*Electron\/[\w.-]+/, '')
+  );
+
+  win.loadURL(APP_URL);
+
+  win.setMenuBarVisibility(false);
+
+  // ── Context Menu ──────────────────────────────────
+  win.webContents.on('context-menu', (_event, params) => {
+    const items = [];
+
+    if (params.linkURL) {
+      items.push(
+        { label: 'Open Link in Browser', click: () => shell.openExternal(params.linkURL) },
+        { label: 'Copy Link', click: () => win.webContents.clipboard?.writeText(params.linkURL) || require('electron').clipboard.writeText(params.linkURL) },
+        { type: 'separator' }
+      );
+    }
+
+    if (params.mediaType === 'image') {
+      items.push(
+        { label: 'Copy Image', click: () => win.webContents.copyImageAt(params.x, params.y) },
+        { label: 'Save Image As...', click: () => win.webContents.downloadURL(params.srcURL) },
+        { type: 'separator' }
+      );
+    }
+
+    if (params.isEditable) {
+      items.push(
+        { label: 'Undo', role: 'undo', enabled: params.editFlags.canUndo },
+        { label: 'Redo', role: 'redo', enabled: params.editFlags.canRedo },
+        { type: 'separator' },
+        { label: 'Cut', role: 'cut', enabled: params.editFlags.canCut },
+        { label: 'Copy', role: 'copy', enabled: params.editFlags.canCopy },
+        { label: 'Paste', role: 'paste', enabled: params.editFlags.canPaste },
+        { label: 'Delete', role: 'delete', enabled: params.editFlags.canDelete },
+        { type: 'separator' },
+        { label: 'Select All', role: 'selectAll', enabled: params.editFlags.canSelectAll }
+      );
+    } else if (params.selectionText) {
+      items.push(
+        { label: 'Copy', role: 'copy' },
+        { label: 'Select All', role: 'selectAll' }
+      );
+    }
+
+    if (items.length === 0) {
+      items.push(
+        { label: 'Back', enabled: win.webContents.canGoBack(), click: () => win.webContents.goBack() },
+        { label: 'Forward', enabled: win.webContents.canGoForward(), click: () => win.webContents.goForward() },
+        { label: 'Reload', click: () => win.webContents.reload() }
+      );
+    }
+
+    Menu.buildFromTemplate(items).popup({ window: win });
+  });
+
+  // ── External Links ────────────────────────────────
+  win.webContents.setWindowOpenHandler(({ url }) => {
+    if (!url.startsWith(APP_ORIGIN)) {
+      shell.openExternal(url);
+      return { action: 'deny' };
+    }
+    return { action: 'allow' };
+  });
+
+  win.webContents.on('will-navigate', (event, url) => {
+    if (!url.startsWith(APP_ORIGIN)) {
+      event.preventDefault();
+      shell.openExternal(url);
+    }
+  });
+
+  // ── Downloads ─────────────────────────────────────
+  win.webContents.session.on('will-download', (_event, item) => {
+    item.setSaveDialogOptions({ defaultPath: item.getFilename() });
+  });
+
+  // ── Crash Recovery ────────────────────────────────
+  win.webContents.on('render-process-gone', (_event, details) => {
+    if (details.reason !== 'clean-exit') {
+      setTimeout(() => win.reload(), 2000);
+    }
+  });
+
+  return win;
+}
+
+app.whenReady().then(createWindow);
+
+app.on('second-instance', () => {
+  const windows = BrowserWindow.getAllWindows();
+  if (windows.length > 0) {
+    const win = windows[0];
+    if (win.isMinimized()) win.restore();
+    win.focus();
+  }
+});
+
+app.on('window-all-closed', () => {
+  if (process.platform !== 'darwin') {
+    app.quit();
+  }
+});
+
+app.on('activate', () => {
+  if (BrowserWindow.getAllWindows().length === 0) {
+    createWindow();
+  }
+});

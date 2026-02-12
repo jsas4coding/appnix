@@ -1,0 +1,20 @@
+import { app, BrowserWindow } from 'electron';
+
+let mainWindow;
+
+app.on('ready', () => {
+  mainWindow = new BrowserWindow({
+    width: {{window.width}},
+    height: {{window.height}},
+    fullscreen: {{window.fullscreen}},
+    webPreferences: {
+      spellcheck: true
+    }
+  });
+
+  mainWindow.loadURL('{{url}}');
+});
+
+app.on('window-all-closed', () => {
+  app.quit();
+});
