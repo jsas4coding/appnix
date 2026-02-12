@@ -1,0 +1,63 @@
+defaults:
+  electron_version: "40.4.0"
+  lang: "en-US"
+  spellcheck:
+    - "en-US"
+    - "pt-BR"
+
+apps:
+  - name: "ClickUp"
+    url: "https://app.clickup.com/90132772393/v/l/6-901322747345-1"
+    icon: "clickup"
+    app_name: "clickup"
+    category: "Utility"
+    description: "Odara Development ClickUp Projects"
+
+  - name: "ChatGPT"
+    url: "https://chat.openai.com"
+    icon: "chatgpt"
+    app_name: "chatgpt"
+    category: "Utility"
+    description: "Access ChatGPT AI conversations quickly"
+
+  - name: "Claude"
+    url: "https://claude.ai"
+    icon: "claude"
+    app_name: "claude"
+    category: "Utility"
+    description: "Access Claude AI conversations quickly"
+
+  - name: "YouTube"
+    url: "https://www.youtube.com"
+    icon: "youtube"
+    app_name: "youtube"
+    category: "Video;Media"
+    description: "Watch and explore YouTube videos"
+
+  - name: "Gmail"
+    url: "https://mail.google.com"
+    icon: "gmail"
+    app_name: "gmail"
+    category: "Network;Email"
+    description: "Access your Gmail inbox"
+
+  - name: "GloboPlay"
+    url: "https://globoplay.globo.com/globonews/ao-vivo/7339101"
+    icon: "globo-play"
+    app_name: "globoplay"
+    category: "Video;Media"
+    description: "Watch GloboPlay content live"
+
+  - name: "WhatsApp"
+    url: "https://web.whatsapp.com"
+    icon: "whatsapp"
+    app_name: "whatsapp"
+    category: "Network;InstantMessaging"
+    description: "Send and receive messages with WhatsApp Web"
+
+  - name: "RegEx101"
+    url: "https://regex101.com"
+    icon: "regex101"
+    app_name: "regex101"
+    category: "Development;Utility"
+    description: "Test and debug regular expressions"

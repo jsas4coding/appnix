@@ -1,116 +1,105 @@
-# AppNix 🚀
+# AppNix
 
-Transform web applications into native Linux desktop applications with ease.
+Convert websites to Linux desktop AppImages.
 
-## 🌟 Overview
+Define your apps in YAML, and AppNix generates Electron wrappers, builds portable AppImages, and creates `.desktop` entries for seamless OS integration.
 
-AppNix is a powerful CLI tool that converts websites into Linux desktop AppImages using Electron, allowing you to turn any web app into a native desktop experience.
+## Requirements
 
-## ✨ Features
-
-- 🌐 Convert web apps to native Linux desktop applications
-- 🔧 Customizable app configurations
-- 🛡️ Secure Electron sandbox
-- 💻 Easy-to-use CLI interface
-- 🖥️ Seamless desktop integration
-
-## 🚀 Quick Start
-
-### Prerequisites
-
-- Node.js (>=22.0.0)
+- Node.js >= 24.0.0
 - Linux operating system
+- `7z` (p7zip-full) — extract AppImage runtime
+- `gh` or `curl` — download AppImage runtime from GitHub
 
-### Installation
+## Quick Start
 
 ```bash
-npm install -g appnix
+# Install the CLI
+npm run setup
+
+# Edit your config
+nano ~/.config/appnix/config.yml
+
+# Build all apps
+appnix build
+
+# List installed apps
+appnix list
+
+# Uninstall an app
+appnix uninstall <app_name>
 ```
 
-### Configuration
+## Configuration
 
-Create a configuration file at `~/.config/appnix/config.yml`:
+Apps are defined in `~/.config/appnix/config.yml`:
 
 ```yaml
 defaults:
-  electron_version: '36.0.0'
+  electron_version: '40.4.0'
   lang: 'en-US'
+  spellcheck:
+    - 'en-US'
+    - 'pt-BR'
 
 apps:
-  - name: 'ChatGPT'
-    url: 'https://chat.openai.com'
-    app_name: 'chatgpt'
-    category: 'Utility;AI'
-    description: 'Chat with AI'
-    icon: '/path/to/icon.png'
+  - name: 'WhatsApp'
+    url: 'https://web.whatsapp.com'
+    icon: 'whatsapp'
+    app_name: 'whatsapp'
+    category: 'Network;InstantMessaging'
+    description: 'Send and receive messages with WhatsApp Web'
     window:
       width: 1280
       height: 800
 ```
 
-### Usage
+See `config.example.yml` for a complete example.
 
-#### Build AppImage
+## Electron Features
+
+Generated apps include production-ready Electron features:
+
+| Feature | Description |
+|---------|-------------|
+| Single instance lock | Prevents duplicate app windows |
+| Persistent sessions | Login state survives restarts |
+| Permission handling | Whitelisted permissions scoped to app origin |
+| External links | Non-app URLs open in system browser |
+| Crash recovery | Auto-reload after renderer crash (2s delay) |
+| Download handling | Native save dialog for downloads |
+| Spellcheck | Configurable languages from config |
+| User agent cleanup | Strips Electron token to avoid site blocking |
+| Security hardening | Context isolation, sandbox, no Node integration |
+
+## Security
+
+- Context isolation enabled — separates web content from Electron internals
+- Sandbox mode — renderer runs with restricted system access
+- Node integration disabled — web content cannot access Node.js APIs
+- Permission whitelist — only notifications, media, geolocation, clipboard allowed
+- Origin-scoped — permissions only granted for the configured app URL
+
+## Development
 
 ```bash
-appnix build
+npm run lint          # Lint with Biome
+npm run format        # Format with Biome
+npm run test          # Unit tests
+npm run test:coverage # Unit tests with coverage
+npm run test:e2e      # End-to-end tests
 ```
 
-#### Install Desktop Entries
+## Documentation
 
-```bash
-appnix install:desktop
-```
+- [`docs/index.html`](docs/index.html) — full interactive documentation
+- [`docs/APPNIX.md`](docs/APPNIX.md) — AI-optimized technical reference
 
-## 🛠️ Development Commands
+## Limitations
 
-```bash
-# Build the project
-npm run build
-
-# Run tests
-npm run test
-
-# Lint code
-npm run lint
-
-# Format code
-npm run format
-```
-
-## 🔒 Security
-
-- Electron sandbox enabled by default
-- Strict configuration validation
-- Minimal runtime permissions
-
-## 🤝 Contributing
-
-1. Fork the repository
-2. Create a feature branch
-3. Commit your changes
-4. Run tests and linting
-5. Submit a pull request
-
-## 📋 Compatibility
-
-- Linux desktop environments
-- Web applications compatible with Electron
-- Node.js >=22.0.0
-
-## 🚧 Limitations
-
-- Currently Linux-only
+- Linux only
 - Requires Chromium-compatible web applications
 
-## 📜 License
+## License
 
-[To be determined]
-
-## 🙏 Acknowledgments
-
-- Electron
-- Electron Builder
-- Handlebars
-- TypeScript Community
-
+MIT

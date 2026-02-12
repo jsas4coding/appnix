@@ -1,100 +1,59 @@
-import fs from 'node:fs';
-import path from 'node:path';
+import fs from 'node:fs/promises';
 
-import { getDesktopEntriesPath, getOptPath } from '@/utils/config';
-
-const DIST_DIR = path.join(process.cwd(), 'dist');
+import { readInstalled, unregisterApp } from '@/utils/installed.js';
 
 /**
- * Ensures that a directory exists. Creates it recursively if it does not exist.
- *
- * @param dir - The directory path to ensure.
+ * Lists all installed AppNix applications.
  */
-function ensureDir(dir: string) {
-  if (!fs.existsSync(dir)) {
-    fs.mkdirSync(dir, { recursive: true });
+export async function listInstalled(): Promise<void> {
+  const registry = await readInstalled();
+  const apps = Object.values(registry);
+
+  if (apps.length === 0) {
+    console.log('No apps installed.');
+    return;
+  }
+
+  console.log(`\nInstalled apps (${apps.length}):\n`);
+  for (const app of apps) {
+    console.log(`  ${app.name} (${app.app_name})`);
+    console.log(`    URL:     ${app.url}`);
+    console.log(`    Binary:  ${app.paths.bin}`);
+    console.log(`    Desktop: ${app.paths.desktop}`);
+    console.log(`    Since:   ${app.installedAt}\n`);
   }
 }
 
 /**
- * Resolves a path depending on the environment. In test mode, redirects paths to the test build directory.
- *
- * @param originalPath - The original absolute path.
- * @returns The resolved path adjusted for the current environment.
+ * Uninstalls an app by name, removing its binary, desktop entry, and icon.
  */
-function resolvePathForEnv(originalPath: string): string {
-  if (process.env.APPNIX_ENV === 'test') {
-    return path.join(process.cwd(), 'tests', 'build', path.relative('/', originalPath));
+export async function uninstallApp(appName: string): Promise<void> {
+  const app = await unregisterApp(appName);
+
+  if (!app) {
+    console.error(`App "${appName}" is not installed.`);
+    return;
   }
-  return originalPath;
-}
 
-/**
- * Returns the path used for storing application icons.
- * Uses the same location as the configuration directory.
- *
- * @returns The resolved icons path adjusted for the current environment.
- */
-function getIconsPath(): string {
-  return resolvePathForEnv(path.join(process.env.HOME || '', '.config', 'appnix', 'icons'));
-}
+  console.log(`Uninstalling ${app.name}...`);
 
-/**
- * Installs AppImages, desktop entries, and icons from the dist directory.
- *
- * - AppImages are copied to the /.local/appnix/{app}/ directory.
- * - Desktop entries are copied to the user's applications directory.
- * - Icons are first read from the configuration icons path and then copied to /.local/appnix alongside each AppImage.
- * - Adjusts permissions for AppImage files to be executable.
- * - Supports test mode by redirecting paths to a safe test build directory.
- */
-export function installAll() {
-  const optPath = resolvePathForEnv(getOptPath());
-  const desktopPath = resolvePathForEnv(getDesktopEntriesPath());
-  const iconsConfigPath = getIconsPath();
+  const removals = [
+    { label: 'Binary', path: app.paths.bin },
+    { label: 'Desktop entry', path: app.paths.desktop },
+    { label: 'Icon', path: app.paths.icon },
+  ];
 
-  console.log('📂 Preparing installation directories...');
-  ensureDir(optPath);
-  ensureDir(desktopPath);
-  ensureDir(iconsConfigPath);
-
-  console.log('📦 Installing AppImages, desktop entries, and icons...');
-  const files = fs.readdirSync(DIST_DIR);
-
-  for (const file of files) {
-    const filePath = path.join(DIST_DIR, file);
-
-    if (file.endsWith('.AppImage')) {
-      const appFolder = file.replace('.AppImage', '');
-      const target = path.join(optPath, appFolder, file);
-      ensureDir(path.dirname(target));
-      fs.copyFileSync(filePath, target);
-      fs.chmodSync(target, 0o755);
-
-      // Copy icon for the app if exists in config icons path
-      const iconFile = `${appFolder}.png`;
-      const iconSource = path.join(iconsConfigPath, iconFile);
-      if (fs.existsSync(iconSource)) {
-        const iconTarget = path.join(optPath, appFolder, iconFile);
-        fs.copyFileSync(iconSource, iconTarget);
-        console.log(`  ✔ Installed icon for ${appFolder}: ${iconTarget}`);
-      }
-
-      console.log(`  ✔ Installed AppImage: ${target}`);
+  for (const { label, path: filePath } of removals) {
+    if (!filePath) {
+      continue;
     }
-
-    if (file.endsWith('.desktop')) {
-      const target = path.join(desktopPath, file);
-      fs.copyFileSync(filePath, target);
-      console.log(`  ✔ Installed desktop entry: ${target}`);
-    }
-
-    if (file.endsWith('.png') || file.endsWith('.svg') || file.endsWith('.ico')) {
-      const target = path.join(iconsConfigPath, file);
-      fs.copyFileSync(filePath, target);
-      console.log(`  ✔ Installed icon: ${target}`);
+    try {
+      await fs.unlink(filePath);
+      console.log(`  Removed ${label}: ${filePath}`);
+    } catch {
+      console.log(`  ${label} not found: ${filePath}`);
     }
   }
 
-  console.log('🎉 Installation complete.');
+  console.log(`${app.name} uninstalled.`);
 }

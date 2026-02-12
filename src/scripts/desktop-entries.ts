@@ -1,16 +1,20 @@
 import fs from 'node:fs/promises';
 import path from 'node:path';
 
-import { loadConfig, validateConfig } from '@/utils/config';
-import { renderTemplate } from '@/utils/template';
+import {
+  getBinPath,
+  getDesktopEntriesPath,
+  getIconsPath,
+  getTemplatesPath,
+  loadConfig,
+  validateConfig,
+} from '@/utils/config.js';
+import { renderTemplate } from '@/utils/template.js';
 
 /**
  * Generates and installs desktop entries for all configured applications.
  *
- * - Loads and validates the AppNix configuration.
- * - Ensures the desktop entry directory exists.
- * - Renders `.desktop` files using Handlebars templates.
- * - Saves the generated files to the system or test environment path.
+ * Renders .desktop files using Handlebars templates with full bin/icon paths.
  */
 export async function generateDesktopEntries(): Promise<void> {
   try {
@@ -19,14 +23,19 @@ export async function generateDesktopEntries(): Promise<void> {
       throw new Error('Invalid configuration');
     }
 
-    const desktopEntryDir = path.resolve(process.env.HOME || '', '.local', 'share', 'applications');
-
+    const desktopEntryDir = getDesktopEntriesPath();
     await fs.mkdir(desktopEntryDir, { recursive: true });
 
     for (const app of config.apps) {
+      const context = {
+        ...app,
+        bin_path: path.join(getBinPath(), app.app_name),
+        icon_path: path.join(getIconsPath(), `${app.app_name}.png`),
+      };
+
       const desktopEntryContent = await renderTemplate(
-        path.join(process.cwd(), 'src', 'templates', 'desktop', 'entry.hbs'),
-        app,
+        path.join(getTemplatesPath(), 'desktop', 'entry.hbs'),
+        context,
       );
 
       const desktopEntryPath = path.join(desktopEntryDir, `${app.app_name}.desktop`);
@@ -40,8 +49,4 @@ export async function generateDesktopEntries(): Promise<void> {
     console.error('Error generating desktop entries:', error);
     throw error;
   }
-}
-
-if (import.meta.url === `file://${process.argv[1]}`) {
-  generateDesktopEntries().catch(console.error);
 }

@@ -4,18 +4,19 @@
   "description": "Convert websites to Linux desktop AppImages",
   "type": "module",
   "engines": {
-    "node": ">=22.0.0"
+    "node": ">=24.0.0"
   },
   "scripts": {
-    "build": "tsc && tsc-alias && node dist/builder/build.js",
+    "setup": "tsc && tsc-alias && node dist/scripts/setup.js && rimraf dist",
+    "build": "tsc && tsc-alias && node dist/builder/build.js && rimraf dist",
     "clean": "rimraf dist",
-    "lint": "eslint . --ext .ts,.mjs",
-    "format": "prettier --write .",
+    "lint": "biome check .",
+    "lint:fix": "biome check --fix .",
+    "format": "biome format --write .",
     "test": "vitest run --watch=false tests/unit",
     "test:coverage": "vitest run --watch=false tests/unit --coverage",
     "test:e2e": "vitest run --watch=false tests/e2e",
-    "test:watch": "vitest watch tests/unit",
-    "install:desktop": "node dist/scripts/desktop-entries.js"
+    "test:watch": "vitest watch tests/unit"
   },
   "dependencies": {
     "electron-builder": "^24.6.4",
@@ -23,15 +24,9 @@
     "yaml": "^2.3.4"
   },
   "devDependencies": {
-    "@types/node": "^22.0.0",
-    "@typescript-eslint/eslint-plugin": "^7.18.0",
-    "@typescript-eslint/parser": "^7.18.0",
+    "@biomejs/biome": "^2.3.14",
+    "@types/node": "^24.0.0",
     "@vitest/coverage-v8": "^1.6.0",
-    "eslint": "^8.57.1",
-    "eslint-config-prettier": "^10.1.8",
-    "eslint-plugin-import": "^2.32.0",
-    "eslint-plugin-simple-import-sort": "^12.1.1",
-    "prettier": "^3.2.5",
     "rimraf": "^5.0.5",
     "tsc-alias": "^1.8.10",
     "typescript": "^5.4.5",

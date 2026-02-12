@@ -3,33 +3,74 @@ import path from 'node:path';
 
 import { parse } from 'yaml';
 
-import type { AppConfig } from '@/types/config';
+import type { AppConfig } from '@/types/config.js';
 
 const HOME = process.env.HOME || '';
 const TEST_BASE = path.join(process.cwd(), 'tests/build');
 const IS_TEST = process.env.APPNIX_ENV === 'test';
 const BASE_PATH = IS_TEST ? TEST_BASE : HOME;
 
+const APPNIX_DIR = path.join(BASE_PATH, '.config', 'appnix');
+
+/**
+ * Returns the base AppNix config directory (~/.config/appnix).
+ */
+export function getAppnixDir(): string {
+  return APPNIX_DIR;
+}
+
 /**
  * Returns the full path to the configuration YAML file.
  */
 export function getConfigFile(): string {
-  return path.join(BASE_PATH, '.config', 'appnix', 'config.yml');
+  return path.join(APPNIX_DIR, 'config.yml');
 }
 
 /**
- * Returns the path where application builds are stored.
+ * Returns the path for temporary build staging (~/.config/appnix/.build).
+ * Cleaned up after each build.
  */
-export function getAppsPath(): string {
-  return path.join(BASE_PATH, '.config', 'appnix', 'apps');
+export function getStagingPath(): string {
+  return path.join(APPNIX_DIR, '.build');
 }
 
 /**
- * Returns the path for /.local/appnix app files (AppImages and icons).
- * In test mode, redirected to tests/build/.local/appnix.
+ * Returns the path where final AppImage binaries are stored (~/.config/appnix/bin).
  */
-export function getOptPath(): string {
-  return IS_TEST ? path.join(BASE_PATH, '.local', 'appnix') : path.join(HOME, '.local', 'appnix');
+export function getBinPath(): string {
+  return path.join(APPNIX_DIR, 'bin');
+}
+
+/**
+ * Returns the path where app icons are stored (~/.config/appnix/icons).
+ */
+export function getIconsPath(): string {
+  return path.join(APPNIX_DIR, 'icons');
+}
+
+/**
+ * Returns the path to installed.json (~/.config/appnix/installed.json).
+ */
+export function getInstalledPath(): string {
+  return path.join(APPNIX_DIR, 'installed.json');
+}
+
+/**
+ * Returns the path to the lib directory (~/.config/appnix/lib).
+ */
+export function getLibPath(): string {
+  return path.join(APPNIX_DIR, 'lib');
+}
+
+/**
+ * Returns the path where Handlebars templates are resolved from.
+ * In test mode, resolves from the project source directory.
+ */
+export function getTemplatesPath(): string {
+  if (IS_TEST) {
+    return path.join(process.cwd(), 'src', 'templates');
+  }
+  return path.join(APPNIX_DIR, 'lib', 'templates');
 }
 
 /**

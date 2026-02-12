@@ -1,0 +1,1495 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>AppNix — Documentation</title>
+  <style>
+    /* ── Reset & Base ────────────────────────────────── */
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    :root {
+      --bg-primary: #0d1117;
+      --bg-secondary: #161b22;
+      --bg-tertiary: #21262d;
+      --bg-overlay: #30363d;
+      --text-primary: #e6edf3;
+      --text-secondary: #8b949e;
+      --text-muted: #6e7681;
+      --accent-blue: #58a6ff;
+      --accent-green: #3fb950;
+      --accent-orange: #d29922;
+      --accent-purple: #bc8cff;
+      --accent-red: #f85149;
+      --accent-cyan: #39d2c0;
+      --border: #30363d;
+      --sidebar-width: 260px;
+      --font-mono: 'SF Mono', 'Cascadia Code', 'Fira Code', 'JetBrains Mono', Consolas, monospace;
+      --font-sans: -apple-system, BlinkMacSystemFont, 'Segoe UI', Helvetica, Arial, sans-serif;
+      --radius: 8px;
+      --radius-sm: 6px;
+    }
+
+    html { scroll-behavior: smooth; scroll-padding-top: 24px; }
+
+    body {
+      font-family: var(--font-sans);
+      background: var(--bg-primary);
+      color: var(--text-primary);
+      line-height: 1.6;
+      -webkit-font-smoothing: antialiased;
+    }
+
+    /* ── Layout ──────────────────────────────────────── */
+    .layout {
+      display: grid;
+      grid-template-columns: var(--sidebar-width) 1fr;
+      min-height: 100vh;
+    }
+
+    /* ── Sidebar ─────────────────────────────────────── */
+    .sidebar {
+      position: sticky;
+      top: 0;
+      height: 100vh;
+      overflow-y: auto;
+      background: var(--bg-secondary);
+      border-right: 1px solid var(--border);
+      padding: 24px 0;
+      scrollbar-width: thin;
+      scrollbar-color: var(--bg-overlay) transparent;
+      z-index: 10;
+    }
+
+    .sidebar-logo {
+      padding: 0 20px 20px;
+      border-bottom: 1px solid var(--border);
+      margin-bottom: 16px;
+    }
+
+    .sidebar-logo h2 {
+      font-size: 18px;
+      font-weight: 700;
+      color: var(--text-primary);
+      letter-spacing: -0.02em;
+    }
+
+    .sidebar-logo span {
+      font-size: 12px;
+      color: var(--text-secondary);
+      display: block;
+      margin-top: 2px;
+    }
+
+    .sidebar nav { padding: 0 12px; }
+
+    .sidebar nav a {
+      display: block;
+      padding: 6px 12px;
+      font-size: 13px;
+      color: var(--text-secondary);
+      text-decoration: none;
+      border-radius: var(--radius-sm);
+      transition: all 0.15s ease;
+      border-left: 2px solid transparent;
+    }
+
+    .sidebar nav a:hover {
+      color: var(--text-primary);
+      background: var(--bg-tertiary);
+    }
+
+    .sidebar nav a.active {
+      color: var(--accent-blue);
+      background: rgba(88, 166, 255, 0.08);
+      border-left-color: var(--accent-blue);
+    }
+
+    .sidebar nav .nav-group {
+      font-size: 11px;
+      font-weight: 600;
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+      color: var(--text-muted);
+      padding: 16px 12px 4px;
+    }
+
+    /* ── Main Content ────────────────────────────────── */
+    .main { padding: 40px 48px 80px; max-width: 960px; }
+
+    /* ── Hero ─────────────────────────────────────────── */
+    .hero {
+      padding: 48px 0 40px;
+      border-bottom: 1px solid var(--border);
+      margin-bottom: 48px;
+    }
+
+    .hero h1 {
+      font-size: 42px;
+      font-weight: 800;
+      letter-spacing: -0.03em;
+      background: linear-gradient(135deg, var(--accent-blue), var(--accent-purple));
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+    }
+
+    .hero .tagline {
+      font-size: 18px;
+      color: var(--text-secondary);
+      margin-top: 8px;
+    }
+
+    .badges {
+      display: flex;
+      gap: 8px;
+      margin-top: 20px;
+      flex-wrap: wrap;
+    }
+
+    .badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      padding: 4px 12px;
+      font-size: 12px;
+      font-weight: 600;
+      border-radius: 20px;
+      border: 1px solid var(--border);
+      background: var(--bg-secondary);
+      color: var(--text-secondary);
+    }
+
+    .badge .dot {
+      width: 8px;
+      height: 8px;
+      border-radius: 50%;
+    }
+
+    .badge .dot.green { background: var(--accent-green); }
+    .badge .dot.blue { background: var(--accent-blue); }
+    .badge .dot.orange { background: var(--accent-orange); }
+    .badge .dot.purple { background: var(--accent-purple); }
+
+    /* ── Sections ─────────────────────────────────────── */
+    section {
+      margin-bottom: 56px;
+      scroll-margin-top: 24px;
+    }
+
+    section > h2 {
+      font-size: 24px;
+      font-weight: 700;
+      color: var(--text-primary);
+      margin-bottom: 20px;
+      padding-bottom: 12px;
+      border-bottom: 1px solid var(--border);
+      letter-spacing: -0.01em;
+    }
+
+    section h3 {
+      font-size: 16px;
+      font-weight: 600;
+      color: var(--text-primary);
+      margin: 24px 0 12px;
+    }
+
+    p { color: var(--text-secondary); margin-bottom: 16px; }
+    p + p { margin-top: -4px; }
+
+    /* ── Cards Grid ───────────────────────────────────── */
+    .cards {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(240px, 1fr));
+      gap: 16px;
+      margin: 16px 0;
+    }
+
+    .card {
+      background: var(--bg-secondary);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      padding: 20px;
+      transition: border-color 0.2s;
+    }
+
+    .card:hover { border-color: var(--accent-blue); }
+
+    .card .card-icon {
+      width: 36px;
+      height: 36px;
+      border-radius: var(--radius-sm);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 18px;
+      margin-bottom: 12px;
+    }
+
+    .card .card-icon.blue { background: rgba(88, 166, 255, 0.12); color: var(--accent-blue); }
+    .card .card-icon.green { background: rgba(63, 185, 80, 0.12); color: var(--accent-green); }
+    .card .card-icon.orange { background: rgba(210, 153, 34, 0.12); color: var(--accent-orange); }
+    .card .card-icon.purple { background: rgba(188, 140, 255, 0.12); color: var(--accent-purple); }
+    .card .card-icon.cyan { background: rgba(57, 210, 192, 0.12); color: var(--accent-cyan); }
+    .card .card-icon.red { background: rgba(248, 81, 73, 0.12); color: var(--accent-red); }
+
+    .card h4 {
+      font-size: 14px;
+      font-weight: 600;
+      color: var(--text-primary);
+      margin-bottom: 6px;
+    }
+
+    .card p {
+      font-size: 13px;
+      color: var(--text-secondary);
+      margin: 0;
+      line-height: 1.5;
+    }
+
+    /* ── Code Blocks ──────────────────────────────────── */
+    .code-block {
+      position: relative;
+      background: var(--bg-secondary);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      margin: 16px 0;
+      overflow: hidden;
+    }
+
+    .code-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 8px 16px;
+      background: var(--bg-tertiary);
+      border-bottom: 1px solid var(--border);
+      font-size: 12px;
+      color: var(--text-muted);
+      font-family: var(--font-mono);
+    }
+
+    .copy-btn {
+      background: none;
+      border: 1px solid var(--border);
+      border-radius: 4px;
+      color: var(--text-secondary);
+      font-size: 11px;
+      padding: 2px 8px;
+      cursor: pointer;
+      font-family: var(--font-sans);
+      transition: all 0.15s;
+    }
+
+    .copy-btn:hover {
+      color: var(--text-primary);
+      border-color: var(--text-secondary);
+    }
+
+    .copy-btn.copied {
+      color: var(--accent-green);
+      border-color: var(--accent-green);
+    }
+
+    pre {
+      padding: 16px;
+      overflow-x: auto;
+      font-family: var(--font-mono);
+      font-size: 13px;
+      line-height: 1.6;
+      scrollbar-width: thin;
+      scrollbar-color: var(--bg-overlay) transparent;
+    }
+
+    code {
+      font-family: var(--font-mono);
+      font-size: 0.9em;
+    }
+
+    p code, li code, td code {
+      background: var(--bg-tertiary);
+      padding: 2px 6px;
+      border-radius: 4px;
+      font-size: 12px;
+      color: var(--accent-cyan);
+    }
+
+    /* ── Syntax Highlighting ──────────────────────────── */
+    .kw { color: var(--accent-purple); }      /* keyword */
+    .ty { color: var(--accent-orange); }       /* type */
+    .fn { color: var(--accent-blue); }         /* function */
+    .str { color: #a5d6ff; }                   /* string */
+    .num { color: var(--accent-orange); }      /* number */
+    .cm { color: var(--text-muted); font-style: italic; }  /* comment */
+    .op { color: var(--accent-red); }          /* operator */
+    .pr { color: var(--text-primary); }        /* property */
+    .bool { color: var(--accent-orange); }     /* boolean */
+    .hbs { color: var(--accent-green); }       /* handlebars expression */
+    .yml-key { color: var(--accent-blue); }    /* yaml key */
+    .yml-val { color: #a5d6ff; }               /* yaml value */
+
+    /* ── Tables ───────────────────────────────────────── */
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      margin: 16px 0;
+      font-size: 13px;
+    }
+
+    thead th {
+      text-align: left;
+      padding: 10px 14px;
+      background: var(--bg-tertiary);
+      color: var(--text-primary);
+      font-weight: 600;
+      font-size: 12px;
+      text-transform: uppercase;
+      letter-spacing: 0.04em;
+      border-bottom: 1px solid var(--border);
+    }
+
+    tbody td {
+      padding: 10px 14px;
+      border-bottom: 1px solid var(--border);
+      color: var(--text-secondary);
+    }
+
+    tbody tr:hover { background: rgba(88, 166, 255, 0.04); }
+
+    /* ── Pipeline / Timeline ──────────────────────────── */
+    .pipeline {
+      position: relative;
+      padding-left: 32px;
+      margin: 24px 0;
+    }
+
+    .pipeline::before {
+      content: '';
+      position: absolute;
+      left: 11px;
+      top: 0;
+      bottom: 0;
+      width: 2px;
+      background: var(--border);
+    }
+
+    .pipeline-step {
+      position: relative;
+      margin-bottom: 24px;
+      padding: 16px 20px;
+      background: var(--bg-secondary);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+    }
+
+    .pipeline-step::before {
+      content: '';
+      position: absolute;
+      left: -27px;
+      top: 20px;
+      width: 12px;
+      height: 12px;
+      border-radius: 50%;
+      background: var(--accent-blue);
+      border: 2px solid var(--bg-primary);
+    }
+
+    .pipeline-step.green::before { background: var(--accent-green); }
+    .pipeline-step.orange::before { background: var(--accent-orange); }
+    .pipeline-step.purple::before { background: var(--accent-purple); }
+
+    .pipeline-step h4 {
+      font-size: 14px;
+      font-weight: 600;
+      color: var(--text-primary);
+      margin-bottom: 6px;
+    }
+
+    .pipeline-step p {
+      font-size: 13px;
+      color: var(--text-secondary);
+      margin: 0;
+    }
+
+    .pipeline-step code {
+      font-size: 12px;
+    }
+
+    /* ── File Tree ────────────────────────────────────── */
+    .file-tree {
+      background: var(--bg-secondary);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      padding: 20px 24px;
+      font-family: var(--font-mono);
+      font-size: 13px;
+      line-height: 1.8;
+      margin: 16px 0;
+    }
+
+    .file-tree .dir { color: var(--accent-blue); font-weight: 600; }
+    .file-tree .file { color: var(--text-secondary); }
+    .file-tree .template { color: var(--accent-orange); }
+    .file-tree .config { color: var(--accent-green); }
+    .file-tree .type { color: var(--accent-purple); }
+    .file-tree .test { color: var(--accent-cyan); }
+
+    /* ── Architecture Diagram ─────────────────────────── */
+    .arch-diagram {
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+      margin: 24px 0;
+      align-items: center;
+    }
+
+    .arch-row {
+      display: flex;
+      gap: 12px;
+      flex-wrap: wrap;
+      justify-content: center;
+    }
+
+    .arch-box {
+      padding: 12px 20px;
+      border-radius: var(--radius);
+      border: 1px solid var(--border);
+      font-size: 13px;
+      font-weight: 500;
+      text-align: center;
+      min-width: 140px;
+      position: relative;
+      cursor: default;
+      transition: all 0.2s;
+    }
+
+    .arch-box:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 4px 16px rgba(0, 0, 0, 0.3);
+    }
+
+    .arch-box.input { background: rgba(88, 166, 255, 0.1); border-color: var(--accent-blue); color: var(--accent-blue); }
+    .arch-box.process { background: rgba(188, 140, 255, 0.1); border-color: var(--accent-purple); color: var(--accent-purple); }
+    .arch-box.template { background: rgba(210, 153, 34, 0.1); border-color: var(--accent-orange); color: var(--accent-orange); }
+    .arch-box.output { background: rgba(63, 185, 80, 0.1); border-color: var(--accent-green); color: var(--accent-green); }
+
+    .arch-box .tooltip {
+      visibility: hidden;
+      opacity: 0;
+      position: absolute;
+      bottom: calc(100% + 8px);
+      left: 50%;
+      transform: translateX(-50%);
+      background: var(--bg-tertiary);
+      color: var(--text-primary);
+      padding: 6px 12px;
+      border-radius: var(--radius-sm);
+      font-size: 11px;
+      white-space: nowrap;
+      border: 1px solid var(--border);
+      transition: all 0.15s;
+      z-index: 10;
+      pointer-events: none;
+    }
+
+    .arch-box:hover .tooltip {
+      visibility: visible;
+      opacity: 1;
+    }
+
+    .arch-arrow {
+      font-size: 20px;
+      color: var(--text-muted);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    /* ── Callout Cards ────────────────────────────────── */
+    .callout {
+      padding: 16px 20px;
+      border-radius: var(--radius);
+      border-left: 3px solid;
+      margin: 12px 0;
+      background: var(--bg-secondary);
+    }
+
+    .callout.blue { border-left-color: var(--accent-blue); }
+    .callout.green { border-left-color: var(--accent-green); }
+    .callout.orange { border-left-color: var(--accent-orange); }
+    .callout.red { border-left-color: var(--accent-red); }
+
+    .callout h4 {
+      font-size: 13px;
+      font-weight: 600;
+      color: var(--text-primary);
+      margin-bottom: 4px;
+    }
+
+    .callout p {
+      font-size: 13px;
+      color: var(--text-secondary);
+      margin: 0;
+    }
+
+    /* ── CLI Cards ────────────────────────────────────── */
+    .cli-card {
+      background: var(--bg-secondary);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      padding: 16px 20px;
+      margin: 10px 0;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 12px;
+    }
+
+    .cli-card .cli-info { flex: 1; }
+
+    .cli-card .cli-label {
+      font-size: 12px;
+      color: var(--text-muted);
+      margin-bottom: 4px;
+    }
+
+    .cli-card .cli-cmd {
+      font-family: var(--font-mono);
+      font-size: 13px;
+      color: var(--accent-green);
+    }
+
+    /* ── Details / Collapsible ────────────────────────── */
+    details {
+      margin: 12px 0;
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      overflow: hidden;
+    }
+
+    details summary {
+      padding: 12px 16px;
+      background: var(--bg-secondary);
+      cursor: pointer;
+      font-size: 14px;
+      font-weight: 500;
+      color: var(--text-primary);
+      user-select: none;
+      list-style: none;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    details summary::before {
+      content: '\25B6';
+      font-size: 10px;
+      color: var(--text-muted);
+      transition: transform 0.2s;
+    }
+
+    details[open] summary::before { transform: rotate(90deg); }
+
+    details summary::-webkit-details-marker { display: none; }
+
+    details .detail-content {
+      padding: 16px;
+      border-top: 1px solid var(--border);
+    }
+
+    /* ── Path Diagram ─────────────────────────────────── */
+    .path-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 16px;
+      margin: 16px 0;
+    }
+
+    .path-column {
+      background: var(--bg-secondary);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      padding: 16px;
+    }
+
+    .path-column h4 {
+      font-size: 13px;
+      font-weight: 600;
+      color: var(--text-primary);
+      margin-bottom: 12px;
+      padding-bottom: 8px;
+      border-bottom: 1px solid var(--border);
+    }
+
+    .path-item {
+      padding: 4px 0;
+      font-family: var(--font-mono);
+      font-size: 12px;
+      color: var(--text-secondary);
+    }
+
+    .path-item .path-label {
+      color: var(--text-muted);
+      font-family: var(--font-sans);
+      font-size: 11px;
+      display: block;
+      margin-bottom: 2px;
+    }
+
+    /* ── Responsive ───────────────────────────────────── */
+    @media (max-width: 768px) {
+      .layout {
+        grid-template-columns: 1fr;
+      }
+      .sidebar {
+        position: fixed;
+        left: -280px;
+        width: 280px;
+        transition: left 0.3s;
+        z-index: 100;
+      }
+      .sidebar.open { left: 0; }
+      .main { padding: 24px 20px 60px; }
+      .hero h1 { font-size: 28px; }
+      .cards { grid-template-columns: 1fr; }
+      .path-grid { grid-template-columns: 1fr; }
+      .mobile-toggle {
+        display: flex !important;
+      }
+    }
+
+    .mobile-toggle {
+      display: none;
+      position: fixed;
+      bottom: 20px;
+      right: 20px;
+      z-index: 200;
+      width: 44px;
+      height: 44px;
+      border-radius: 50%;
+      background: var(--accent-blue);
+      color: var(--bg-primary);
+      border: none;
+      cursor: pointer;
+      align-items: center;
+      justify-content: center;
+      font-size: 18px;
+      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.4);
+    }
+  </style>
+</head>
+<body>
+
+<button class="mobile-toggle" onclick="document.querySelector('.sidebar').classList.toggle('open')" aria-label="Toggle navigation">&#9776;</button>
+
+<div class="layout">
+
+  <!-- ═══════════════ SIDEBAR ═══════════════ -->
+  <aside class="sidebar">
+    <div class="sidebar-logo">
+      <h2>AppNix</h2>
+      <span>v0.1.0 &middot; Documentation</span>
+    </div>
+    <nav>
+      <div class="nav-group">Getting Started</div>
+      <a href="#overview">Overview</a>
+      <a href="#architecture">Architecture</a>
+      <a href="#build-pipeline">Build Pipeline</a>
+
+      <div class="nav-group">Configuration</div>
+      <a href="#configuration">Config File</a>
+      <a href="#file-structure">File Structure</a>
+
+      <div class="nav-group">Technical</div>
+      <a href="#types">Types &amp; Interfaces</a>
+      <a href="#templates">Templates</a>
+      <a href="#security">Security</a>
+
+      <div class="nav-group">Usage</div>
+      <a href="#cli-commands">CLI Commands</a>
+      <a href="#paths">Installation Paths</a>
+      <a href="#testing">Testing</a>
+    </nav>
+  </aside>
+
+  <!-- ═══════════════ MAIN ═══════════════ -->
+  <main class="main">
+
+    <!-- ── Hero ──────────────────────────── -->
+    <header class="hero" id="hero">
+      <h1>AppNix</h1>
+      <p class="tagline">Convert websites to Linux desktop AppImages</p>
+      <div class="badges">
+        <span class="badge"><span class="dot green"></span> v0.1.0</span>
+        <span class="badge"><span class="dot blue"></span> Node &ge;24</span>
+        <span class="badge"><span class="dot orange"></span> Electron</span>
+        <span class="badge"><span class="dot purple"></span> TypeScript</span>
+      </div>
+    </header>
+
+    <!-- ── Overview ──────────────────────── -->
+    <section id="overview">
+      <h2>Overview</h2>
+      <p>AppNix transforms web applications into standalone Linux desktop apps. Define your apps in a YAML config, and AppNix generates Electron wrappers, builds AppImages, and creates desktop entries for seamless OS integration.</p>
+
+      <div class="cards">
+        <div class="card">
+          <div class="card-icon blue">&#9881;</div>
+          <h4>YAML-Driven</h4>
+          <p>Single config file defines all your apps with URLs, icons, window options, and metadata.</p>
+        </div>
+        <div class="card">
+          <div class="card-icon green">&#9889;</div>
+          <h4>Electron Wrapper</h4>
+          <p>Generates secure Electron apps with sandbox, context isolation, and minimal permissions.</p>
+        </div>
+        <div class="card">
+          <div class="card-icon orange">&#128230;</div>
+          <h4>AppImage Output</h4>
+          <p>Produces portable AppImages that run anywhere on Linux without installation dependencies.</p>
+        </div>
+        <div class="card">
+          <div class="card-icon purple">&#128187;</div>
+          <h4>Desktop Integration</h4>
+          <p>Creates <code>.desktop</code> entries for app launchers, search, and taskbar pinning.</p>
+        </div>
+        <div class="card">
+          <div class="card-icon cyan">&#128296;</div>
+          <h4>Template Engine</h4>
+          <p>Handlebars templates for Electron entry, package.json, and desktop entries.</p>
+        </div>
+        <div class="card">
+          <div class="card-icon red">&#128270;</div>
+          <h4>Batch Processing</h4>
+          <p>Configure multiple apps and build them all in a single command.</p>
+        </div>
+      </div>
+    </section>
+
+    <!-- ── Architecture ──────────────────── -->
+    <section id="architecture">
+      <h2>Architecture</h2>
+      <p>Data flows from the YAML config through template rendering to electron-builder output.</p>
+
+      <div class="arch-diagram">
+        <div class="arch-row">
+          <div class="arch-box input">
+            config.yml
+            <span class="tooltip">~/.config/appnix/config.yml</span>
+          </div>
+        </div>
+        <div class="arch-arrow">&darr;</div>
+        <div class="arch-row">
+          <div class="arch-box process">
+            loadConfig()
+            <span class="tooltip">src/utils/config.ts &mdash; Parse YAML, validate</span>
+          </div>
+        </div>
+        <div class="arch-arrow">&darr;</div>
+        <div class="arch-row">
+          <div class="arch-box template">
+            main.hbs
+            <span class="tooltip">Electron main process template</span>
+          </div>
+          <div class="arch-box template">
+            package.hbs
+            <span class="tooltip">Electron package.json template</span>
+          </div>
+          <div class="arch-box template">
+            entry.hbs
+            <span class="tooltip">.desktop entry template</span>
+          </div>
+        </div>
+        <div class="arch-arrow">&darr;</div>
+        <div class="arch-row">
+          <div class="arch-box process">
+            generateElectronApp()
+            <span class="tooltip">src/utils/template.ts &mdash; Render &amp; write files</span>
+          </div>
+        </div>
+        <div class="arch-arrow">&darr;</div>
+        <div class="arch-row">
+          <div class="arch-box process">
+            electron-builder
+            <span class="tooltip">src/builder/build.ts &mdash; Package as AppImage</span>
+          </div>
+        </div>
+        <div class="arch-arrow">&darr;</div>
+        <div class="arch-row">
+          <div class="arch-box output">
+            bin/{app_name}
+            <span class="tooltip">~/.config/appnix/bin/{app_name}</span>
+          </div>
+          <div class="arch-box output">
+            .desktop
+            <span class="tooltip">~/.local/share/applications/{app_name}.desktop</span>
+          </div>
+          <div class="arch-box output">
+            installed.json
+            <span class="tooltip">~/.config/appnix/installed.json</span>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ── Build Pipeline ────────────────── -->
+    <section id="build-pipeline">
+      <h2>Build Pipeline</h2>
+      <p>The build process runs through distinct stages from cleanup to installation.</p>
+
+      <div class="pipeline">
+        <div class="pipeline-step">
+          <h4>1. Bootstrap</h4>
+          <p>Ensure AppImage runtime is cached. Downloads <code>appimage-12.0.1.7z</code> from GitHub if missing.</p>
+          <p>Uses <code>ensureAppImageRuntime()</code> from <code>src/builder/setup.ts</code></p>
+        </div>
+        <div class="pipeline-step purple">
+          <h4>2. Compile</h4>
+          <p>TypeScript compilation with path alias resolution.</p>
+          <p><code>tsc</code> &rarr; <code>tsc-alias</code> rewrites <code>@/*</code> imports to relative paths</p>
+        </div>
+        <div class="pipeline-step orange">
+          <h4>3. Generate</h4>
+          <p>For each app: render templates to staging at <code>~/.config/appnix/.build/{app}/</code></p>
+          <p>Creates <code>main.js</code>, <code>package.json</code>, <code>.desktop</code> entry, then runs <code>npm install</code></p>
+        </div>
+        <div class="pipeline-step green">
+          <h4>4. Build AppImage</h4>
+          <p>Invoke <code>electron-builder</code> for each app. Output to staging.</p>
+          <p>Move final AppImage &rarr; <code>~/.config/appnix/bin/{app_name}</code> (chmod 755)</p>
+        </div>
+        <div class="pipeline-step">
+          <h4>5. Register &amp; Cleanup</h4>
+          <p>Update <code>installed.json</code> with app paths for future uninstall.</p>
+          <p>Remove all staging directories. Nothing stays in the repo.</p>
+        </div>
+      </div>
+    </section>
+
+    <!-- ── Configuration ─────────────────── -->
+    <section id="configuration">
+      <h2>Configuration</h2>
+      <p>Apps are defined in a single YAML file at <code>~/.config/appnix/config.yml</code>.</p>
+
+      <div class="code-block">
+        <div class="code-header">
+          <span>config.yml</span>
+          <button class="copy-btn" onclick="copyCode(this)">Copy</button>
+        </div>
+<pre><span class="yml-key">defaults:</span>
+  <span class="yml-key">electron_version:</span> <span class="yml-val">'36.0.0'</span>
+  <span class="yml-key">lang:</span> <span class="yml-val">'en-US'</span>
+  <span class="yml-key">spellcheck:</span>
+    - <span class="yml-val">'en-US'</span>
+    - <span class="yml-val">'pt-BR'</span>
+
+<span class="yml-key">apps:</span>
+  - <span class="yml-key">name:</span> <span class="yml-val">'ChatGPT'</span>
+    <span class="yml-key">url:</span> <span class="yml-val">'https://chat.openai.com'</span>
+    <span class="yml-key">icon:</span> <span class="yml-val">'chatgpt'</span>
+    <span class="yml-key">app_name:</span> <span class="yml-val">'chatgpt'</span>
+    <span class="yml-key">category:</span> <span class="yml-val">'Utility'</span>
+    <span class="yml-key">description:</span> <span class="yml-val">'Access ChatGPT AI conversations quickly'</span>
+    <span class="yml-key">window:</span>
+      <span class="yml-key">width:</span> <span class="num">1280</span>
+      <span class="yml-key">height:</span> <span class="num">800</span>
+      <span class="yml-key">fullscreen:</span> <span class="bool">false</span></pre>
+      </div>
+
+      <h3>Property Reference</h3>
+
+      <table>
+        <thead>
+          <tr>
+            <th>Field</th>
+            <th>Type</th>
+            <th>Required</th>
+            <th>Default</th>
+            <th>Description</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr><td><code>defaults.electron_version</code></td><td><code>string</code></td><td>Yes</td><td>&mdash;</td><td>Electron version for builds</td></tr>
+          <tr><td><code>defaults.lang</code></td><td><code>string</code></td><td>Yes</td><td>&mdash;</td><td>Language locale</td></tr>
+          <tr><td><code>defaults.spellcheck</code></td><td><code>string[]</code></td><td>Yes</td><td>&mdash;</td><td>Spellcheck languages</td></tr>
+          <tr><td><code>apps[].name</code></td><td><code>string</code></td><td>Yes</td><td>&mdash;</td><td>Display name</td></tr>
+          <tr><td><code>apps[].url</code></td><td><code>string</code></td><td>Yes</td><td>&mdash;</td><td>URL to load in Electron</td></tr>
+          <tr><td><code>apps[].icon</code></td><td><code>string</code></td><td>No</td><td>&mdash;</td><td>Icon name or path</td></tr>
+          <tr><td><code>apps[].app_name</code></td><td><code>string</code></td><td>Yes</td><td>&mdash;</td><td>Internal identifier</td></tr>
+          <tr><td><code>apps[].category</code></td><td><code>string</code></td><td>Yes</td><td>&mdash;</td><td>FreeDesktop category</td></tr>
+          <tr><td><code>apps[].description</code></td><td><code>string</code></td><td>Yes</td><td>&mdash;</td><td>Short description</td></tr>
+          <tr><td><code>apps[].window.width</code></td><td><code>number</code></td><td>No</td><td><code>1280</code></td><td>Window width (px)</td></tr>
+          <tr><td><code>apps[].window.height</code></td><td><code>number</code></td><td>No</td><td><code>800</code></td><td>Window height (px)</td></tr>
+          <tr><td><code>apps[].window.fullscreen</code></td><td><code>boolean</code></td><td>No</td><td><code>false</code></td><td>Start fullscreen</td></tr>
+        </tbody>
+      </table>
+    </section>
+
+    <!-- ── File Structure ────────────────── -->
+    <section id="file-structure">
+      <h2>File Structure</h2>
+
+      <div class="file-tree">
+<span class="dir">appnix/</span>
+├── <span class="config">package.json</span>
+├── <span class="config">tsconfig.json</span>
+├── <span class="config">biome.json</span>
+├── <span class="config">vitest.config.ts</span>
+├── <span class="config">config.example.yml</span>
+├── <span class="dir">src/</span>
+│   ├── <span class="dir">types/</span>
+│   │   ├── <span class="type">app.ts</span> <span style="color:var(--text-muted)">── WindowConfig, AppConfig, GlobalConfig</span>
+│   │   └── <span class="type">config.ts</span> <span style="color:var(--text-muted)">── AppConfig (legacy, used at runtime)</span>
+│   ├── <span class="dir">utils/</span>
+│   │   ├── <span class="file">config.ts</span> <span style="color:var(--text-muted)">── Config loading, validation, paths</span>
+│   │   ├── <span class="file">template.ts</span> <span style="color:var(--text-muted)">── Template rendering, app generation</span>
+│   │   └── <span class="file">installed.ts</span> <span style="color:var(--text-muted)">── Installation registry (installed.json)</span>
+│   ├── <span class="dir">builder/</span>
+│   │   ├── <span class="file">build.ts</span> <span style="color:var(--text-muted)">── Build orchestration</span>
+│   │   └── <span class="file">setup.ts</span> <span style="color:var(--text-muted)">── AppImage runtime bootstrap</span>
+│   ├── <span class="dir">scripts/</span>
+│   │   ├── <span class="file">install.ts</span> <span style="color:var(--text-muted)">── List + uninstall apps</span>
+│   │   └── <span class="file">desktop-entries.ts</span> <span style="color:var(--text-muted)">── Desktop entry generation</span>
+│   └── <span class="dir">templates/</span>
+│       ├── <span class="dir">electron/</span>
+│       │   ├── <span class="template">main.hbs</span> <span style="color:var(--text-muted)">── Electron main process</span>
+│       │   └── <span class="template">package.hbs</span> <span style="color:var(--text-muted)">── Electron package.json</span>
+│       └── <span class="dir">desktop/</span>
+│           └── <span class="template">entry.hbs</span> <span style="color:var(--text-muted)">── .desktop file</span>
+├── <span class="dir">tests/</span>
+│   ├── <span class="dir">unit/</span>
+│   │   ├── <span class="dir">utils/</span>
+│   │   │   ├── <span class="test">config.test.ts</span>
+│   │   │   └── <span class="test">template.test.ts</span>
+│   │   ├── <span class="dir">builder/</span>
+│   │   │   └── <span class="test">build.test.ts</span>
+│   │   └── <span class="dir">scripts/</span>
+│   │       ├── <span class="test">install.test.ts</span>
+│   │       └── <span class="test">desktop-entries.test.ts</span>
+│   └── <span class="dir">e2e/</span>
+│       └── <span class="test">full-flow.test.ts</span>
+├── <span class="dir">dist/</span> <span style="color:var(--text-muted)">── Compiled output (gitignored)</span>
+└── <span class="dir">docs/</span>
+    ├── <span class="file">index.html</span> <span style="color:var(--text-muted)">── This documentation</span>
+    └── <span class="file">APPNIX.md</span> <span style="color:var(--text-muted)">── AI reference</span>
+      </div>
+    </section>
+
+    <!-- ── Types & Interfaces ────────────── -->
+    <section id="types">
+      <h2>Types &amp; Interfaces</h2>
+
+      <details open>
+        <summary>WindowConfig</summary>
+        <div class="detail-content">
+          <div class="code-block">
+            <div class="code-header">
+              <span>src/types/app.ts</span>
+              <button class="copy-btn" onclick="copyCode(this)">Copy</button>
+            </div>
+<pre><span class="kw">export interface</span> <span class="ty">WindowConfig</span> {
+  <span class="pr">fullscreen</span>?: <span class="ty">boolean</span>;
+  <span class="pr">width</span>?: <span class="ty">number</span>;
+  <span class="pr">height</span>?: <span class="ty">number</span>;
+}</pre>
+          </div>
+        </div>
+      </details>
+
+      <details open>
+        <summary>AppConfig (app.ts)</summary>
+        <div class="detail-content">
+          <div class="code-block">
+            <div class="code-header">
+              <span>src/types/app.ts</span>
+              <button class="copy-btn" onclick="copyCode(this)">Copy</button>
+            </div>
+<pre><span class="kw">export interface</span> <span class="ty">AppConfig</span> {
+  <span class="pr">name</span>: <span class="ty">string</span>;           <span class="cm">// Display name</span>
+  <span class="pr">url</span>: <span class="ty">string</span>;            <span class="cm">// URL to open in Electron</span>
+  <span class="pr">icon</span>: <span class="ty">string</span>;           <span class="cm">// Path to icon</span>
+  <span class="pr">app_name</span>: <span class="ty">string</span>;       <span class="cm">// Internal name (folders/files)</span>
+  <span class="pr">category</span>?: <span class="ty">string</span>;      <span class="cm">// Desktop category</span>
+  <span class="pr">description</span>?: <span class="ty">string</span>;   <span class="cm">// Short description</span>
+  <span class="pr">window</span>?: <span class="ty">WindowConfig</span>;   <span class="cm">// Window options</span>
+}</pre>
+          </div>
+        </div>
+      </details>
+
+      <details open>
+        <summary>GlobalConfig</summary>
+        <div class="detail-content">
+          <div class="code-block">
+            <div class="code-header">
+              <span>src/types/app.ts</span>
+              <button class="copy-btn" onclick="copyCode(this)">Copy</button>
+            </div>
+<pre><span class="kw">export interface</span> <span class="ty">GlobalConfig</span> {
+  <span class="pr">defaults</span>: {
+    <span class="pr">electron_version</span>: <span class="ty">string</span>;
+    <span class="pr">lang</span>: <span class="ty">string</span>;
+    <span class="pr">spellcheck</span>: <span class="ty">string</span>[];
+  };
+  <span class="pr">apps</span>: <span class="ty">AppConfig</span>[];
+}</pre>
+          </div>
+        </div>
+      </details>
+
+      <details>
+        <summary>AppConfig (config.ts &mdash; Legacy, used at runtime)</summary>
+        <div class="detail-content">
+          <div class="code-block">
+            <div class="code-header">
+              <span>src/types/config.ts</span>
+              <button class="copy-btn" onclick="copyCode(this)">Copy</button>
+            </div>
+<pre><span class="kw">export interface</span> <span class="ty">AppConfig</span> {
+  <span class="pr">defaults</span>: {
+    <span class="pr">electron_version</span>: <span class="ty">string</span>;
+    <span class="pr">lang</span>: <span class="ty">string</span>;
+    <span class="pr">spellcheck</span>: <span class="ty">string</span>[];
+  };
+  <span class="pr">apps</span>: <span class="ty">Array</span>&lt;{
+    <span class="pr">name</span>: <span class="ty">string</span>;
+    <span class="pr">url</span>: <span class="ty">string</span>;
+    <span class="pr">icon</span>?: <span class="ty">string</span>;
+    <span class="pr">app_name</span>: <span class="ty">string</span>;
+    <span class="pr">category</span>: <span class="ty">string</span>;
+    <span class="pr">description</span>: <span class="ty">string</span>;
+    <span class="pr">window</span>?: {
+      <span class="pr">fullscreen</span>?: <span class="ty">boolean</span>;
+      <span class="pr">width</span>?: <span class="ty">number</span>;
+      <span class="pr">height</span>?: <span class="ty">number</span>;
+    };
+  }&gt;;
+}</pre>
+          </div>
+        </div>
+      </details>
+    </section>
+
+    <!-- ── Templates ─────────────────────── -->
+    <section id="templates">
+      <h2>Templates</h2>
+      <p>AppNix uses Handlebars templates to generate Electron app files and desktop entries.</p>
+
+      <details open>
+        <summary>main.hbs &mdash; Electron Main Process</summary>
+        <div class="detail-content">
+          <div class="code-block">
+            <div class="code-header">
+              <span>src/templates/electron/main.hbs</span>
+              <button class="copy-btn" onclick="copyCode(this)">Copy</button>
+            </div>
+<pre><span class="kw">import</span> { app, BrowserWindow, session, shell } <span class="kw">from</span> <span class="str">'electron'</span>;
+
+<span class="kw">const</span> gotLock = app.<span class="fn">requestSingleInstanceLock</span>();
+<span class="kw">if</span> (!gotLock) app.<span class="fn">quit</span>();
+
+<span class="kw">const</span> APP_URL = <span class="str">'<span class="hbs">{{url}}</span>'</span>;
+<span class="kw">const</span> APP_ORIGIN = <span class="kw">new</span> <span class="ty">URL</span>(APP_URL).origin;
+
+<span class="kw">function</span> <span class="fn">createWindow</span>() {
+  <span class="kw">const</span> ses = session.<span class="fn">fromPartition</span>(<span class="str">'persist:<span class="hbs">{{app_name}}</span>'</span>);
+  ses.<span class="fn">setSpellCheckerLanguages</span>(<span class="hbs">{{{json spellcheck}}}</span>);
+  ses.<span class="fn">setPermissionRequestHandler</span>(<span class="cm">/* whitelist */</span>);
+
+  <span class="kw">const</span> win = <span class="kw">new</span> <span class="ty">BrowserWindow</span>({
+    <span class="pr">width</span>: <span class="hbs">{{window.width}}</span>, <span class="pr">height</span>: <span class="hbs">{{window.height}}</span>,
+    <span class="pr">webPreferences</span>: {
+      <span class="pr">contextIsolation</span>: <span class="bool">true</span>, <span class="pr">sandbox</span>: <span class="bool">true</span>,
+      <span class="pr">nodeIntegration</span>: <span class="bool">false</span>, <span class="pr">session</span>: ses,
+      <span class="pr">backgroundThrottling</span>: <span class="bool">false</span>, <span class="pr">spellcheck</span>: <span class="bool">true</span>
+    }
+  });
+
+  win.webContents.<span class="fn">setUserAgent</span>(<span class="cm">/* strip Electron/ token */</span>);
+  win.<span class="fn">loadURL</span>(APP_URL);
+
+  <span class="cm">// External links &rarr; system browser</span>
+  win.webContents.<span class="fn">setWindowOpenHandler</span>(<span class="cm">/* ... */</span>);
+  win.webContents.<span class="fn">on</span>(<span class="str">'will-navigate'</span>, <span class="cm">/* ... */</span>);
+
+  <span class="cm">// Crash recovery &mdash; reload after 2s</span>
+  win.webContents.<span class="fn">on</span>(<span class="str">'render-process-gone'</span>, <span class="cm">/* ... */</span>);
+}</pre>
+          </div>
+          <h3>Template Variables</h3>
+          <table>
+            <thead><tr><th>Variable</th><th>Source</th><th>Usage</th></tr></thead>
+            <tbody>
+              <tr><td><code>{{url}}</code></td><td><code>app.url</code></td><td>App URL, origin check, loadURL()</td></tr>
+              <tr><td><code>{{app_name}}</code></td><td><code>app.app_name</code></td><td>Persistent session partition name</td></tr>
+              <tr><td><code>{{window.width}}</code></td><td><code>app.window.width</code> or 1280</td><td>BrowserWindow width</td></tr>
+              <tr><td><code>{{window.height}}</code></td><td><code>app.window.height</code> or 800</td><td>BrowserWindow height</td></tr>
+              <tr><td><code>{{#if window.fullscreen}}</code></td><td><code>app.window.fullscreen</code></td><td>Conditional fullscreen</td></tr>
+              <tr><td><code>{{{json spellcheck}}}</code></td><td><code>defaults.spellcheck</code></td><td>Spellcheck languages (raw JSON)</td></tr>
+            </tbody>
+          </table>
+        </div>
+      </details>
+
+      <details>
+        <summary>package.hbs &mdash; Electron package.json</summary>
+        <div class="detail-content">
+          <div class="code-block">
+            <div class="code-header">
+              <span>src/templates/electron/package.hbs</span>
+              <button class="copy-btn" onclick="copyCode(this)">Copy</button>
+            </div>
+<pre>{
+  <span class="str">"name"</span>: <span class="str">"<span class="hbs">{{app_name}}</span>"</span>,
+  <span class="str">"version"</span>: <span class="str">"1.0.0"</span>,
+  <span class="str">"description"</span>: <span class="str">"<span class="hbs">{{description}}</span>"</span>,
+  <span class="str">"main"</span>: <span class="str">"main.js"</span>,
+  <span class="str">"type"</span>: <span class="str">"module"</span>,
+  <span class="str">"devDependencies"</span>: {
+    <span class="str">"electron"</span>: <span class="str">"<span class="hbs">{{electron_version}}</span>"</span>
+  }
+}</pre>
+          </div>
+        </div>
+      </details>
+
+      <details>
+        <summary>entry.hbs &mdash; Desktop Entry</summary>
+        <div class="detail-content">
+          <div class="code-block">
+            <div class="code-header">
+              <span>src/templates/desktop/entry.hbs</span>
+              <button class="copy-btn" onclick="copyCode(this)">Copy</button>
+            </div>
+<pre>[Desktop Entry]
+Version=1.0
+Type=Application
+Name=<span class="hbs">{{name}}</span>
+Comment=<span class="hbs">{{description}}</span>
+Exec=<span class="hbs">{{bin_path}}</span> --no-sandbox %U
+Icon=<span class="hbs">{{icon_path}}</span>
+Terminal=false
+Categories=<span class="hbs">{{category}}</span>
+StartupWMClass=<span class="hbs">{{app_name}}</span>
+StartupNotify=true</pre>
+          </div>
+        </div>
+      </details>
+    </section>
+
+    <!-- ── Security ──────────────────────── -->
+    <section id="security">
+      <h2>Security</h2>
+      <p>Generated Electron apps follow security best practices with multiple isolation layers.</p>
+
+      <div class="cards">
+        <div class="card">
+          <div class="card-icon green">&#128274;</div>
+          <h4>Context Isolation</h4>
+          <p><code>contextIsolation: true</code> &mdash; Separates preload scripts from page content, preventing web pages from accessing Electron internals.</p>
+        </div>
+        <div class="card">
+          <div class="card-icon blue">&#128737;</div>
+          <h4>Sandbox Mode</h4>
+          <p><code>sandbox: true</code> &mdash; Runs the renderer process in a Chromium sandbox with restricted system access.</p>
+        </div>
+        <div class="card">
+          <div class="card-icon red">&#128683;</div>
+          <h4>No Node Integration</h4>
+          <p><code>nodeIntegration: false</code> &mdash; Prevents web content from accessing Node.js APIs, blocking file system and process manipulation.</p>
+        </div>
+        <div class="card">
+          <div class="card-icon orange">&#128295;</div>
+          <h4>Permission Whitelist</h4>
+          <p>Only <code>notifications</code>, <code>media</code>, <code>geolocation</code>, and <code>clipboard-read</code> are allowed, scoped to the app origin.</p>
+        </div>
+        <div class="card">
+          <div class="card-icon purple">&#128256;</div>
+          <h4>External Link Isolation</h4>
+          <p>URLs outside the app origin are intercepted and opened in the system browser, preventing navigation to untrusted sites.</p>
+        </div>
+        <div class="card">
+          <div class="card-icon cyan">&#128203;</div>
+          <h4>Single Instance Lock</h4>
+          <p><code>requestSingleInstanceLock()</code> &mdash; Prevents duplicate app windows and ensures a single controlled process.</p>
+        </div>
+      </div>
+    </section>
+
+    <!-- ── CLI Commands ──────────────────── -->
+    <section id="cli-commands">
+      <h2>CLI Commands</h2>
+
+      <div class="cli-card">
+        <div class="cli-info">
+          <div class="cli-label">Build AppImages for all configured apps</div>
+          <div class="cli-cmd">appnix build</div>
+        </div>
+        <button class="copy-btn" onclick="copyText(this, 'appnix build')">Copy</button>
+      </div>
+
+      <div class="cli-card">
+        <div class="cli-info">
+          <div class="cli-label">List installed apps</div>
+          <div class="cli-cmd">appnix list</div>
+        </div>
+        <button class="copy-btn" onclick="copyText(this, 'appnix list')">Copy</button>
+      </div>
+
+      <div class="cli-card">
+        <div class="cli-info">
+          <div class="cli-label">Uninstall an app</div>
+          <div class="cli-cmd">appnix uninstall &lt;app_name&gt;</div>
+        </div>
+        <button class="copy-btn" onclick="copyText(this, 'appnix uninstall ')">Copy</button>
+      </div>
+
+      <div class="cli-card">
+        <div class="cli-info">
+          <div class="cli-label">Install CLI and setup</div>
+          <div class="cli-cmd">npm run setup</div>
+        </div>
+        <button class="copy-btn" onclick="copyText(this, 'npm run setup')">Copy</button>
+      </div>
+
+      <div class="cli-card">
+        <div class="cli-info">
+          <div class="cli-label">Run unit tests</div>
+          <div class="cli-cmd">npm run test</div>
+        </div>
+        <button class="copy-btn" onclick="copyText(this, 'npm run test')">Copy</button>
+      </div>
+
+      <div class="cli-card">
+        <div class="cli-info">
+          <div class="cli-label">Run unit tests with coverage</div>
+          <div class="cli-cmd">npm run test:coverage</div>
+        </div>
+        <button class="copy-btn" onclick="copyText(this, 'npm run test:coverage')">Copy</button>
+      </div>
+
+      <div class="cli-card">
+        <div class="cli-info">
+          <div class="cli-label">Run end-to-end tests</div>
+          <div class="cli-cmd">npm run test:e2e</div>
+        </div>
+        <button class="copy-btn" onclick="copyText(this, 'npm run test:e2e')">Copy</button>
+      </div>
+
+      <div class="cli-card">
+        <div class="cli-info">
+          <div class="cli-label">Lint code with Biome</div>
+          <div class="cli-cmd">npm run lint</div>
+        </div>
+        <button class="copy-btn" onclick="copyText(this, 'npm run lint')">Copy</button>
+      </div>
+
+      <div class="cli-card">
+        <div class="cli-info">
+          <div class="cli-label">Format code with Biome</div>
+          <div class="cli-cmd">npm run format</div>
+        </div>
+        <button class="copy-btn" onclick="copyText(this, 'npm run format')">Copy</button>
+      </div>
+
+      <div class="cli-card">
+        <div class="cli-info">
+          <div class="cli-label">Clean build artifacts</div>
+          <div class="cli-cmd">npm run clean</div>
+        </div>
+        <button class="copy-btn" onclick="copyText(this, 'npm run clean')">Copy</button>
+      </div>
+    </section>
+
+    <!-- ── Installation Paths ────────────── -->
+    <section id="paths">
+      <h2>Installation &amp; Paths</h2>
+      <p>AppNix uses XDG-compatible paths. In test mode (<code>APPNIX_ENV=test</code>), all paths redirect to <code>tests/build/</code>.</p>
+
+      <div class="path-grid">
+        <div class="path-column">
+          <h4>Production Paths</h4>
+          <div class="path-item">
+            <span class="path-label">Base directory</span>
+            ~/.config/appnix/
+          </div>
+          <div class="path-item">
+            <span class="path-label">Config file</span>
+            ~/.config/appnix/config.yml
+          </div>
+          <div class="path-item">
+            <span class="path-label">Build staging</span>
+            ~/.config/appnix/.build/{app}/
+          </div>
+          <div class="path-item">
+            <span class="path-label">AppImages (bin)</span>
+            ~/.config/appnix/bin/{app_name}
+          </div>
+          <div class="path-item">
+            <span class="path-label">Icons</span>
+            ~/.config/appnix/icons/
+          </div>
+          <div class="path-item">
+            <span class="path-label">Installed registry</span>
+            ~/.config/appnix/installed.json
+          </div>
+          <div class="path-item">
+            <span class="path-label">Desktop entries</span>
+            ~/.local/share/applications/
+          </div>
+        </div>
+        <div class="path-column">
+          <h4>Test Paths (APPNIX_ENV=test)</h4>
+          <div class="path-item">
+            <span class="path-label">Base directory</span>
+            $CWD/tests/build/.config/appnix/
+          </div>
+          <div class="path-item">
+            <span class="path-label">Config file</span>
+            $CWD/tests/build/.config/appnix/config.yml
+          </div>
+          <div class="path-item">
+            <span class="path-label">Build staging</span>
+            $CWD/tests/build/.config/appnix/.build/{app}/
+          </div>
+          <div class="path-item">
+            <span class="path-label">AppImages (bin)</span>
+            $CWD/tests/build/.config/appnix/bin/{app_name}
+          </div>
+          <div class="path-item">
+            <span class="path-label">Icons</span>
+            $CWD/tests/build/.config/appnix/icons/
+          </div>
+          <div class="path-item">
+            <span class="path-label">Installed registry</span>
+            $CWD/tests/build/.config/appnix/installed.json
+          </div>
+          <div class="path-item">
+            <span class="path-label">Desktop entries</span>
+            $CWD/tests/build/.local/share/applications/
+          </div>
+        </div>
+      </div>
+
+      <h3>Path Resolution Functions</h3>
+      <table>
+        <thead><tr><th>Function</th><th>Returns</th></tr></thead>
+        <tbody>
+          <tr><td><code>getAppnixDir()</code></td><td><code>{BASE}/.config/appnix</code></td></tr>
+          <tr><td><code>getConfigFile()</code></td><td><code>{BASE}/.config/appnix/config.yml</code></td></tr>
+          <tr><td><code>getStagingPath()</code></td><td><code>{BASE}/.config/appnix/.build</code></td></tr>
+          <tr><td><code>getBinPath()</code></td><td><code>{BASE}/.config/appnix/bin</code></td></tr>
+          <tr><td><code>getIconsPath()</code></td><td><code>{BASE}/.config/appnix/icons</code></td></tr>
+          <tr><td><code>getInstalledPath()</code></td><td><code>{BASE}/.config/appnix/installed.json</code></td></tr>
+          <tr><td><code>getDesktopEntriesPath()</code></td><td><code>{BASE}/.local/share/applications</code></td></tr>
+        </tbody>
+      </table>
+      <p><code>{BASE}</code> = <code>$HOME</code> in production, <code>$CWD/tests/build</code> in test mode.</p>
+    </section>
+
+    <!-- ── Testing ───────────────────────── -->
+    <section id="testing">
+      <h2>Testing</h2>
+      <p>Tests use Vitest with <code>vite-tsconfig-paths</code> for path alias resolution. Coverage via V8 provider.</p>
+
+      <div class="cards">
+        <div class="card">
+          <div class="card-icon blue">&#128196;</div>
+          <h4>config.test.ts</h4>
+          <p>Tests <code>loadConfig()</code>, <code>validateConfig()</code>, and all path resolution functions.</p>
+        </div>
+        <div class="card">
+          <div class="card-icon green">&#128196;</div>
+          <h4>template.test.ts</h4>
+          <p>Tests <code>renderTemplate()</code> and <code>generateElectronApp()</code> with mock configs.</p>
+        </div>
+        <div class="card">
+          <div class="card-icon orange">&#128196;</div>
+          <h4>build.test.ts</h4>
+          <p>Tests <code>buildAppImages()</code> orchestration with mocked electron-builder.</p>
+        </div>
+        <div class="card">
+          <div class="card-icon purple">&#128196;</div>
+          <h4>install.test.ts</h4>
+          <p>Tests <code>listInstalled()</code> and <code>uninstallApp()</code> with registry tracking and file cleanup.</p>
+        </div>
+        <div class="card">
+          <div class="card-icon cyan">&#128196;</div>
+          <h4>desktop-entries.test.ts</h4>
+          <p>Tests <code>generateDesktopEntries()</code> template rendering and file output.</p>
+        </div>
+        <div class="card">
+          <div class="card-icon red">&#128196;</div>
+          <h4>full-flow.test.ts</h4>
+          <p>E2E test covering the complete build and installation pipeline.</p>
+        </div>
+      </div>
+
+      <div class="callout blue">
+        <h4>Test Environment</h4>
+        <p>Set <code>APPNIX_ENV=test</code> to redirect all file operations to <code>tests/build/</code>, preventing changes to your real system directories.</p>
+      </div>
+    </section>
+
+  </main>
+</div>
+
+<!-- ═══════════════ SCRIPTS ═══════════════ -->
+<script>
+  // ── Scroll Spy ──────────────────────────
+  const navLinks = document.querySelectorAll('.sidebar nav a[href^="#"]');
+  const sections = [];
+
+  navLinks.forEach(link => {
+    const id = link.getAttribute('href').slice(1);
+    const el = document.getElementById(id);
+    if (el) sections.push({ el, link });
+  });
+
+  const observer = new IntersectionObserver(entries => {
+    entries.forEach(entry => {
+      if (entry.isIntersecting) {
+        navLinks.forEach(l => l.classList.remove('active'));
+        const match = sections.find(s => s.el === entry.target);
+        if (match) match.link.classList.add('active');
+      }
+    });
+  }, { rootMargin: '-20% 0px -75% 0px' });
+
+  sections.forEach(s => observer.observe(s.el));
+
+  // ── Copy to Clipboard ───────────────────
+  function copyCode(btn) {
+    const pre = btn.closest('.code-block').querySelector('pre');
+    const text = pre.textContent;
+    navigator.clipboard.writeText(text).then(() => {
+      btn.textContent = 'Copied!';
+      btn.classList.add('copied');
+      setTimeout(() => {
+        btn.textContent = 'Copy';
+        btn.classList.remove('copied');
+      }, 2000);
+    });
+  }
+
+  function copyText(btn, text) {
+    navigator.clipboard.writeText(text).then(() => {
+      btn.textContent = 'Copied!';
+      btn.classList.add('copied');
+      setTimeout(() => {
+        btn.textContent = 'Copy';
+        btn.classList.remove('copied');
+      }, 2000);
+    });
+  }
+
+  // ── Mobile sidebar close on link click ──
+  navLinks.forEach(link => {
+    link.addEventListener('click', () => {
+      document.querySelector('.sidebar').classList.remove('open');
+    });
+  });
+</script>
+
+</body>
+</html>
