@@ -49,7 +49,7 @@ export async function generateElectronApp(
     lang: defaults.lang,
     spellcheck: defaults.spellcheck,
     bin_path: path.join(getBinPath(), app.app_name),
-    icon_path: path.join(getIconsPath(), `${app.app_name}.png`),
+    icon_path: path.join(getIconsPath(), `${app.icon}.png`),
   };
 
   const stagingDir = path.join(getStagingPath(), app.app_name);

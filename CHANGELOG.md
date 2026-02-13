@@ -16,6 +16,10 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
 - **User agent cleanup** — strips `Electron/` and app name tokens to avoid website detection/blocking
 - **Handlebars `json` helper** — enables serialization of arrays/objects in templates
 
+### Fixed
+
+- **App icons** — icon path in desktop entries and electron-builder now uses `app.icon` field instead of `app_name`, fixing mismatches like GloboPlay (`globoplay` vs `globo-play`)
+
 ### Changed
 
 - **Node.js runtime** — minimum version bumped from 22 to 24 (Active LTS)

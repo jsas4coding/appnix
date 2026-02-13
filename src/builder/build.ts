@@ -64,7 +64,7 @@ export async function buildSingleApp(
     linux: {
       target: ['AppImage'],
       category: app.category,
-      icon: app.icon,
+      icon: path.join(getIconsPath(), `${app.icon}.png`),
     },
     files: ['**/*', '!**/*.ts', '!tsconfig.json', '!package-lock.json'],
   };
