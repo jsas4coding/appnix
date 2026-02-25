@@ -1,4 +1,4 @@
-import { app, BrowserWindow, Menu, shell } from 'electron';
+import { app, BrowserWindow, Menu, shell, clipboard } from 'electron';
 
 app.commandLine.appendSwitch('no-sandbox');
 
@@ -9,6 +9,8 @@ if (!gotLock) {
 
 const APP_URL = '{{url}}';
 const APP_ORIGIN = new URL(APP_URL).origin;
+
+let ctrlPressed = false;
 
 function createWindow() {
   const win = new BrowserWindow({
@@ -32,6 +34,12 @@ function createWindow() {
 
   win.setMenuBarVisibility(false);
 
+  // ── Track Ctrl Key ─────────────────────────────────
+  win.webContents.on('before-input-event', (_event, input) => {
+    if (input.type === 'keyDown' && input.key === 'Control') ctrlPressed = true;
+    if (input.type === 'keyUp' && input.key === 'Control') ctrlPressed = false;
+  });
+
   // ── Context Menu ──────────────────────────────────
   win.webContents.on('context-menu', (_event, params) => {
     const items = [];
@@ -39,7 +47,7 @@ function createWindow() {
     if (params.linkURL) {
       items.push(
         { label: 'Open Link in Browser', click: () => shell.openExternal(params.linkURL) },
-        { label: 'Copy Link', click: () => win.webContents.clipboard?.writeText(params.linkURL) || require('electron').clipboard.writeText(params.linkURL) },
+        { label: 'Copy Link', click: () => clipboard.writeText(params.linkURL) },
         { type: 'separator' }
       );
     }
@@ -82,17 +90,22 @@ function createWindow() {
     Menu.buildFromTemplate(items).popup({ window: win });
   });
 
-  // ── External Links ────────────────────────────────
+  // ── Link Navigation ──────────────────────────────
+  // Click: navigate in app | Ctrl+Click: open in system browser
   win.webContents.setWindowOpenHandler(({ url }) => {
-    if (!url.startsWith(APP_ORIGIN)) {
+    if (ctrlPressed) {
       shell.openExternal(url);
+      return { action: 'deny' };
+    }
+    if (!url.startsWith(APP_ORIGIN)) {
+      win.loadURL(url);
       return { action: 'deny' };
     }
     return { action: 'allow' };
   });
 
   win.webContents.on('will-navigate', (event, url) => {
-    if (!url.startsWith(APP_ORIGIN)) {
+    if (ctrlPressed && !url.startsWith(APP_ORIGIN)) {
       event.preventDefault();
       shell.openExternal(url);
     }

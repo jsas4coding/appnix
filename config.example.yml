@@ -1,5 +1,5 @@
 defaults:
-  electron_version: "40.4.0"
+  electron_version: "40.6.1"
   lang: "en-US"
   spellcheck:
     - "en-US"
