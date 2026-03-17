@@ -15,6 +15,9 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
 - **Download handling** — native save dialog for file downloads
 - **User agent cleanup** — strips `Electron/` and app name tokens to avoid website detection/blocking
 - **Handlebars `json` helper** — enables serialization of arrays/objects in templates
+- **App icons** — added icon set for Canva, MailPit, Nuit Docs, and other configured apps
+- **Canva app** — added to example config (Graphics;2DGraphics;RasterGraphics)
+- **Tasker configuration** — added `.tasker/` config, `Makefile`, `Taskfile.yml` for task automation
 
 ### Fixed
 
@@ -27,7 +30,7 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
 - **`@types/node`** — updated from `^22.0.0` to `^24.0.0`
 - **Electron `main.hbs` template** — rewritten from minimal to production-ready
 - **Window size** — hardcoded to 1280x800, menu bar always hidden
-- **Electron** — updated default version from 40.4.0 to 40.6.1
+- **Electron** — updated default version from 40.4.0 to 41.0.2
 - **Apps** — replaced ClickUp with Todoist in example config
 
 ### Removed

@@ -1,0 +1,310 @@
+{
+  "meta": {
+    "generatedAt": "2026-02-28T12:25:54Z",
+    "generatedBy": "tasker",
+    "sourceConfig": ".tasker/config.yml"
+  },
+  "name": "appnix",
+  "description": "appnix project tasks",
+  "version": "3",
+  "vars": {
+    "PROJECT_NAME": "appnix",
+    "PROJECT_ROOT": "{{.ROOT_DIR}}"
+  },
+  "environments": {
+    "dev": {
+      "key": "dev",
+      "name": "Development",
+      "description": "Local development environment",
+      "dotenv": [".env", ".env.local"]
+    },
+    "prod": {
+      "key": "prod",
+      "name": "Production",
+      "description": "Production environment",
+      "dotenv": [".env", ".env.production"]
+    },
+    "test": {
+      "key": "test",
+      "name": "Testing",
+      "description": "Automated testing environment",
+      "dotenv": [".env", ".env.test"]
+    }
+  },
+  "groups": [
+    {
+      "key": "appnix",
+      "name": "AppNix",
+      "description": "Build, install and manage AppImage applications",
+      "builtin": false,
+      "tasks": [
+        {
+          "fullKey": "appnix:dev:all",
+          "groupKey": "appnix",
+          "taskKey": "dev:all",
+          "name": "Build and integrate",
+          "description": "Build all apps and generate desktop entries",
+          "environment": "dev",
+          "cmds": ["appnix all"],
+          "builtin": false
+        },
+        {
+          "fullKey": "appnix:dev:build",
+          "groupKey": "appnix",
+          "taskKey": "dev:build",
+          "name": "Build all apps",
+          "description": "Build AppImages for all configured apps",
+          "environment": "dev",
+          "cmds": ["appnix build"],
+          "builtin": false
+        },
+        {
+          "fullKey": "appnix:dev:desktop",
+          "groupKey": "appnix",
+          "taskKey": "dev:desktop",
+          "name": "Desktop entries",
+          "description": "Generate .desktop entries for all configured apps",
+          "environment": "dev",
+          "cmds": ["appnix desktop"],
+          "builtin": false
+        },
+        {
+          "fullKey": "appnix:dev:install",
+          "groupKey": "appnix",
+          "taskKey": "dev:install",
+          "name": "Install app",
+          "description": "Build and install a single app by name",
+          "environment": "dev",
+          "cmds": ["appnix install {{.CLI_ARGS}}"],
+          "builtin": false
+        },
+        {
+          "fullKey": "appnix:dev:list",
+          "groupKey": "appnix",
+          "taskKey": "dev:list",
+          "name": "List apps",
+          "description": "Show all installed AppNix applications",
+          "environment": "dev",
+          "cmds": ["appnix list"],
+          "builtin": false
+        },
+        {
+          "fullKey": "appnix:dev:reinstall",
+          "groupKey": "appnix",
+          "taskKey": "dev:reinstall",
+          "name": "Reinstall app",
+          "description": "Uninstall and rebuild a single app (kills running process)",
+          "environment": "dev",
+          "cmds": ["appnix reinstall {{.CLI_ARGS}}"],
+          "builtin": false
+        },
+        {
+          "fullKey": "appnix:dev:setup",
+          "groupKey": "appnix",
+          "taskKey": "dev:setup",
+          "name": "Setup CLI",
+          "description": "Compile TypeScript and install AppNix CLI to ~/.config/appnix",
+          "environment": "dev",
+          "cmds": ["npm run setup"],
+          "builtin": false
+        },
+        {
+          "fullKey": "appnix:dev:uninstall",
+          "groupKey": "appnix",
+          "taskKey": "dev:uninstall",
+          "name": "Uninstall app",
+          "description": "Remove an installed app and its desktop entry",
+          "environment": "dev",
+          "cmds": ["appnix uninstall {{.CLI_ARGS}}"],
+          "builtin": false
+        }
+      ]
+    },
+    {
+      "key": "lint",
+      "name": "Lint",
+      "description": "Code quality checks and formatting with Biome",
+      "builtin": false,
+      "tasks": [
+        {
+          "fullKey": "lint:dev:check",
+          "groupKey": "lint",
+          "taskKey": "dev:check",
+          "name": "Lint check",
+          "description": "Run Biome linter and formatter checks",
+          "environment": "dev",
+          "cmds": ["npx biome check ."],
+          "builtin": false
+        },
+        {
+          "fullKey": "lint:dev:fix",
+          "groupKey": "lint",
+          "taskKey": "dev:fix",
+          "name": "Lint fix",
+          "description": "Run Biome linter with auto-fix",
+          "environment": "dev",
+          "cmds": ["npx biome check --fix ."],
+          "builtin": false
+        },
+        {
+          "fullKey": "lint:dev:format",
+          "groupKey": "lint",
+          "taskKey": "dev:format",
+          "name": "Format code",
+          "description": "Format source files with Biome",
+          "environment": "dev",
+          "cmds": ["npx biome format --write ."],
+          "builtin": false
+        }
+      ]
+    },
+    {
+      "key": "npm",
+      "name": "Node.js",
+      "description": "Node.js build, setup and dependency management",
+      "builtin": false,
+      "tasks": [
+        {
+          "fullKey": "npm:dev:clean",
+          "groupKey": "npm",
+          "taskKey": "dev:clean",
+          "name": "Clean dist",
+          "description": "Remove compiled output directory",
+          "environment": "dev",
+          "cmds": ["npx rimraf dist"],
+          "builtin": false
+        },
+        {
+          "fullKey": "npm:dev:compile",
+          "groupKey": "npm",
+          "taskKey": "dev:compile",
+          "name": "Compile TypeScript",
+          "description": "Compile TypeScript source to JavaScript",
+          "environment": "dev",
+          "cmds": ["tsc \u0026\u0026 tsc-alias"],
+          "builtin": false
+        },
+        {
+          "fullKey": "npm:dev:install",
+          "groupKey": "npm",
+          "taskKey": "dev:install",
+          "name": "Install dependencies",
+          "description": "Install Node.js dependencies",
+          "environment": "dev",
+          "cmds": ["npm install"],
+          "builtin": false
+        }
+      ]
+    },
+    {
+      "key": "tasker",
+      "name": "Tasker",
+      "description": "Built-in management commands",
+      "builtin": true,
+      "tasks": [
+        {
+          "fullKey": "tasker:export",
+          "groupKey": "tasker",
+          "taskKey": "export",
+          "name": "Export",
+          "description": "Export resolved config as Tasker.json",
+          "cmds": ["tasker export"],
+          "builtin": true
+        },
+        {
+          "fullKey": "tasker:generate",
+          "groupKey": "tasker",
+          "taskKey": "generate",
+          "name": "Generate",
+          "description": "Generate Taskfile.yml, Makefile, and Tasker.json",
+          "cmds": ["tasker generate"],
+          "builtin": true
+        },
+        {
+          "fullKey": "tasker:init",
+          "groupKey": "tasker",
+          "taskKey": "init",
+          "name": "Init",
+          "description": "Scaffold a new Tasker project",
+          "cmds": ["tasker init"],
+          "builtin": true
+        },
+        {
+          "fullKey": "tasker:list",
+          "groupKey": "tasker",
+          "taskKey": "list",
+          "name": "List",
+          "description": "Show structured task list",
+          "cmds": ["tasker list"],
+          "builtin": true
+        },
+        {
+          "fullKey": "tasker:validate",
+          "groupKey": "tasker",
+          "taskKey": "validate",
+          "name": "Validate",
+          "description": "Validate Tasker configuration",
+          "cmds": ["tasker validate"],
+          "builtin": true
+        },
+        {
+          "fullKey": "tasker:version",
+          "groupKey": "tasker",
+          "taskKey": "version",
+          "name": "Version",
+          "description": "Print version information",
+          "cmds": ["tasker version"],
+          "builtin": true
+        }
+      ]
+    },
+    {
+      "key": "test",
+      "name": "Test",
+      "description": "Unit, e2e and coverage testing with Vitest",
+      "builtin": false,
+      "tasks": [
+        {
+          "fullKey": "test:dev:coverage",
+          "groupKey": "test",
+          "taskKey": "dev:coverage",
+          "name": "Test coverage",
+          "description": "Run unit tests with coverage report",
+          "environment": "dev",
+          "cmds": ["npx vitest run --watch=false tests/unit --coverage"],
+          "builtin": false
+        },
+        {
+          "fullKey": "test:dev:e2e",
+          "groupKey": "test",
+          "taskKey": "dev:e2e",
+          "name": "E2E tests",
+          "description": "Run end-to-end tests with Vitest",
+          "environment": "dev",
+          "cmds": ["npx vitest run --watch=false tests/e2e"],
+          "builtin": false
+        },
+        {
+          "fullKey": "test:dev:unit",
+          "groupKey": "test",
+          "taskKey": "dev:unit",
+          "name": "Unit tests",
+          "description": "Run unit tests with Vitest",
+          "environment": "dev",
+          "cmds": ["npx vitest run --watch=false tests/unit"],
+          "builtin": false
+        },
+        {
+          "fullKey": "test:dev:watch",
+          "groupKey": "test",
+          "taskKey": "dev:watch",
+          "name": "Watch tests",
+          "description": "Run unit tests in watch mode",
+          "environment": "dev",
+          "cmds": ["npx vitest watch tests/unit"],
+          "builtin": false
+        }
+      ]
+    }
+  ]
+}

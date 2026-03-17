@@ -42,6 +42,15 @@ export async function buildSingleApp(
 
   console.log(`\n── Building ${app.name} ──`);
 
+  // 0. Kill running process to prevent ETXTBSY when overwriting binary
+  const finalBinCheck = path.join(binPath, app.app_name);
+  try {
+    execSync(`pkill -f "${finalBinCheck}"`, { stdio: 'ignore' });
+    console.log(`Stopped running ${app.name} process`);
+  } catch {
+    // App may not be running — ignore
+  }
+
   // 1. Generate Electron app files in staging
   await generateElectronApp(app, defaults);
 
@@ -87,7 +96,7 @@ export async function buildSingleApp(
 
   // 5. Register in installed.json
   const desktopEntryPath = path.join(desktopPath, `${app.app_name}.desktop`);
-  const iconPath = path.join(iconsPath, `${app.app_name}.png`);
+  const iconPath = path.join(iconsPath, `${app.icon || app.app_name}.png`);
   const hasIcon = await fileExists(iconPath);
 
   await registerApp({
@@ -147,9 +156,7 @@ export async function buildAppByName(appName: string): Promise<void> {
     throw new Error('Invalid configuration');
   }
 
-  const app = config.apps.find(
-    (a) => a.app_name.toLowerCase() === appName.toLowerCase(),
-  );
+  const app = config.apps.find((a) => a.app_name.toLowerCase() === appName.toLowerCase());
 
   if (!app) {
     throw new Error(

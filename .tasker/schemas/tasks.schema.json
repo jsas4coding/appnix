@@ -1,0 +1,71 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://raw.githubusercontent.com/jsas4coding/tasker/v1.0.1/schemas/tasks.schema.json",
+  "title": "Tasker Group Tasks",
+  "description": "Schema for .tasker/tasks/*.yml files - task definitions within a Tasker group",
+  "type": "object",
+  "required": ["tasks"],
+  "additionalProperties": false,
+  "properties": {
+    "tasks": {
+      "type": "object",
+      "description": "Task definitions. Keys use {environment}:{action} format (e.g., dev:build, prod:deploy)",
+      "minProperties": 1,
+      "additionalProperties": {
+        "$ref": "#/$defs/task"
+      },
+      "propertyNames": {
+        "pattern": "^[a-z][a-z0-9_-]*(:[a-z][a-z0-9_-]*)*$"
+      }
+    }
+  },
+  "$defs": {
+    "task": {
+      "type": "object",
+      "description": "A single task definition",
+      "required": ["name", "cmds"],
+      "additionalProperties": false,
+      "properties": {
+        "name": {
+          "type": "string",
+          "description": "Display name for the task (shown in help output)",
+          "minLength": 1
+        },
+        "description": {
+          "type": "string",
+          "description": "Task description (shown in task listings and generated desc field)"
+        },
+        "environment": {
+          "type": "string",
+          "description": "Environment this task belongs to. When set, generates a precondition that checks the ENV variable. Must match a key in Tasker.yml environments",
+          "pattern": "^[a-z][a-z0-9_-]*$",
+          "examples": ["dev", "test", "prod"]
+        },
+        "cmds": {
+          "type": "array",
+          "description": "Commands to execute (in order)",
+          "minItems": 1,
+          "items": {
+            "type": "string"
+          }
+        },
+        "dir": {
+          "type": "string",
+          "description": "Working directory for the task. Supports Taskfile template syntax"
+        },
+        "deps": {
+          "type": "array",
+          "description": "Task dependencies (run before this task). Use full task keys ({group}:{env}:{action})",
+          "items": {
+            "type": "string"
+          }
+        },
+        "silent": {
+          "type": "boolean",
+          "description": "Suppress command echoing in output",
+          "default": false
+        }
+      }
+    }
+  }
+}

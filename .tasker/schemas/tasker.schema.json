@@ -1,0 +1,126 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://raw.githubusercontent.com/jsas4coding/tasker/v1.0.1/schemas/tasker.schema.json",
+  "title": "Tasker Configuration",
+  "description": "Schema for .tasker/config.yml - task bundler configuration for Taskfile.yml and Makefile generation",
+  "type": "object",
+  "required": ["name", "groups"],
+  "additionalProperties": false,
+  "properties": {
+    "module": {
+      "type": "string",
+      "description": "Go module path or project identifier",
+      "examples": ["tasker.jsas.dev", "github.com/user/project"]
+    },
+    "name": {
+      "type": "string",
+      "description": "Project display name",
+      "minLength": 1
+    },
+    "description": {
+      "type": "string",
+      "description": "Project description shown in help output"
+    },
+    "version": {
+      "type": "string",
+      "description": "Taskfile schema version for generated output",
+      "default": "3",
+      "enum": ["3"]
+    },
+    "environments": {
+      "type": "object",
+      "description": "Deployment environments with dotenv configuration",
+      "additionalProperties": {
+        "$ref": "#/$defs/environment"
+      },
+      "propertyNames": {
+        "pattern": "^[a-z][a-z0-9_-]*$"
+      }
+    },
+    "vars": {
+      "type": "object",
+      "description": "Global variables available to all tasks. Supports Taskfile template syntax (e.g., {{.ROOT_DIR}})",
+      "additionalProperties": {
+        "type": "string"
+      }
+    },
+    "ecosystem": {
+      "type": "object",
+      "description": "Child projects for monorepo/ecosystem mode. Each entry points to a subdirectory with its own Tasker.yml",
+      "additionalProperties": {
+        "$ref": "#/$defs/ecosystemEntry"
+      },
+      "propertyNames": {
+        "pattern": "^[a-z][a-z0-9_-]*$"
+      }
+    },
+    "groups": {
+      "type": "object",
+      "description": "Task groups. Each group key maps to a .tasker/tasks/<key>.yml file",
+      "minProperties": 1,
+      "additionalProperties": {
+        "$ref": "#/$defs/group"
+      },
+      "propertyNames": {
+        "pattern": "^[a-z][a-z0-9_-]*$"
+      }
+    }
+  },
+  "$defs": {
+    "environment": {
+      "type": "object",
+      "description": "A deployment environment definition",
+      "required": ["name"],
+      "additionalProperties": false,
+      "properties": {
+        "name": {
+          "type": "string",
+          "description": "Display name for the environment",
+          "minLength": 1
+        },
+        "description": {
+          "type": "string",
+          "description": "Environment description shown in help output"
+        },
+        "dotenv": {
+          "type": "array",
+          "description": "Dotenv files to load (in order, last wins for conflicts)",
+          "items": {
+            "type": "string"
+          },
+          "examples": [[".env", ".env.local"]]
+        }
+      }
+    },
+    "ecosystemEntry": {
+      "type": "object",
+      "description": "A child project in ecosystem mode",
+      "required": ["path"],
+      "additionalProperties": false,
+      "properties": {
+        "path": {
+          "type": "string",
+          "description": "Relative path to the child project directory",
+          "examples": ["./site", "./api"]
+        }
+      }
+    },
+    "group": {
+      "type": "object",
+      "description": "A task group definition. The group key determines the .tasker/tasks/ filename (lowercase)",
+      "required": ["name"],
+      "additionalProperties": false,
+      "properties": {
+        "name": {
+          "type": "string",
+          "description": "Display name for the group",
+          "minLength": 1
+        },
+        "description": {
+          "type": "string",
+          "description": "Group description shown in help output"
+        }
+      }
+    }
+  }
+}

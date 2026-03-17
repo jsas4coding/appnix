@@ -92,10 +92,17 @@ function createWindow() {
 
   // ── Link Navigation ──────────────────────────────
   // Click: navigate in app | Ctrl+Click: open in system browser
+  const AUTH_HOSTS = ['accounts.google.com', 'appleid.apple.com', 'login.microsoftonline.com', 'github.com/login'];
+
   win.webContents.setWindowOpenHandler(({ url }) => {
     if (ctrlPressed) {
+      ctrlPressed = false;
       shell.openExternal(url);
       return { action: 'deny' };
+    }
+    const isAuth = AUTH_HOSTS.some(h => url.includes(h));
+    if (isAuth) {
+      return { action: 'allow' };
     }
     if (!url.startsWith(APP_ORIGIN)) {
       win.loadURL(url);
@@ -106,6 +113,7 @@ function createWindow() {
 
   win.webContents.on('will-navigate', (event, url) => {
     if (ctrlPressed && !url.startsWith(APP_ORIGIN)) {
+      ctrlPressed = false;
       event.preventDefault();
       shell.openExternal(url);
     }

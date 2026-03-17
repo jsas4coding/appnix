@@ -36,7 +36,7 @@ Apps are defined in `~/.config/appnix/config.yml`:
 
 ```yaml
 defaults:
-  electron_version: '40.4.0'
+  electron_version: '41.0.2'
   lang: 'en-US'
   spellcheck:
     - 'en-US'
@@ -61,7 +61,7 @@ Generated apps include production-ready Electron features:
 |---------|-------------|
 | Native context menu | Cut, Copy, Paste, links, images, navigation |
 | Single instance lock | Prevents duplicate app windows |
-| External links | Non-app URLs open in system browser |
+| Smart link navigation | In-app navigation + Ctrl+click for system browser |
 | Crash recovery | Auto-reload after renderer crash (2s delay) |
 | Download handling | Native save dialog for downloads |
 | User agent cleanup | Strips Electron token to avoid site blocking |

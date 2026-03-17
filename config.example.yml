@@ -34,6 +34,13 @@ apps:
     category: "Office;Network;Email"
     description: "Email, contacts and calendar integration"
 
+  - name: "Canva"
+    url: "https://www.canva.com"
+    icon: "canva"
+    app_name: "canva"
+    category: "Graphics;2DGraphics;RasterGraphics"
+    description: "Online design and visual communication platform"
+
   - name: "WhatsApp"
     url: "https://web.whatsapp.com"
     icon: "whatsapp"

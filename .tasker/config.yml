@@ -1,0 +1,39 @@
+# yaml-language-server: $schema=schemas/tasker.schema.json
+name: appnix
+description: appnix project tasks
+version: "3"
+environments:
+    dev:
+        name: Development
+        description: Local development environment
+        dotenv:
+            - .env
+            - .env.local
+    prod:
+        name: Production
+        description: Production environment
+        dotenv:
+            - .env
+            - .env.production
+    test:
+        name: Testing
+        description: Automated testing environment
+        dotenv:
+            - .env
+            - .env.test
+vars:
+    PROJECT_NAME: appnix
+    PROJECT_ROOT: '{{.ROOT_DIR}}'
+groups:
+    appnix:
+        name: AppNix
+        description: Build, install and manage AppImage applications
+    npm:
+        name: Node.js
+        description: Node.js build, setup and dependency management
+    lint:
+        name: Lint
+        description: Code quality checks and formatting with Biome
+    test:
+        name: Test
+        description: Unit, e2e and coverage testing with Vitest

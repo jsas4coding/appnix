@@ -11,5 +11,6 @@ export interface AppConfig {
     app_name: string;
     category: string;
     description: string;
+    keywords?: string[];
   }>;
 }

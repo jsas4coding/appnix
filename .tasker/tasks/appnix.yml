@@ -1,0 +1,57 @@
+# yaml-language-server: $schema=../schemas/tasks.schema.json
+tasks:
+    dev:setup:
+        name: Setup CLI
+        description: Compile TypeScript and install AppNix CLI to ~/.config/appnix
+        environment: dev
+        cmds:
+            - npm run setup
+
+    dev:build:
+        name: Build all apps
+        description: Build AppImages for all configured apps
+        environment: dev
+        cmds:
+            - appnix build
+
+    dev:install:
+        name: Install app
+        description: Build and install a single app by name
+        environment: dev
+        cmds:
+            - appnix install {{.CLI_ARGS}}
+
+    dev:reinstall:
+        name: Reinstall app
+        description: Uninstall and rebuild a single app (kills running process)
+        environment: dev
+        cmds:
+            - appnix reinstall {{.CLI_ARGS}}
+
+    dev:uninstall:
+        name: Uninstall app
+        description: Remove an installed app and its desktop entry
+        environment: dev
+        cmds:
+            - appnix uninstall {{.CLI_ARGS}}
+
+    dev:list:
+        name: List apps
+        description: Show all installed AppNix applications
+        environment: dev
+        cmds:
+            - appnix list
+
+    dev:desktop:
+        name: Desktop entries
+        description: Generate .desktop entries for all configured apps
+        environment: dev
+        cmds:
+            - appnix desktop
+
+    dev:all:
+        name: Build and integrate
+        description: Build all apps and generate desktop entries
+        environment: dev
+        cmds:
+            - appnix all

@@ -1,13 +1,16 @@
 import { execSync } from 'node:child_process';
-import { createReadStream } from 'node:fs';
 import fs from 'node:fs/promises';
-import { createWriteStream } from 'node:fs';
-import https from 'node:https';
 import os from 'node:os';
 import path from 'node:path';
 
 const APPIMAGE_VERSION = 'appimage-12.0.1';
-export const CACHE_DIR = path.join(os.homedir(), '.cache', 'electron-builder', 'appimage', APPIMAGE_VERSION);
+export const CACHE_DIR = path.join(
+  os.homedir(),
+  '.cache',
+  'electron-builder',
+  'appimage',
+  APPIMAGE_VERSION,
+);
 const RELEASE_REPO = 'electron-userland/electron-builder-binaries';
 const ARCHIVE_NAME = `${APPIMAGE_VERSION}.7z`;
 
@@ -22,7 +25,7 @@ export async function ensureAppImageRuntime(): Promise<void> {
   const runtimePath = path.join(CACHE_DIR, 'runtime-x64');
   const mksquashfsPath = path.join(CACHE_DIR, 'linux-x64', 'mksquashfs');
 
-  if (await isValidElf(runtimePath) && await fileExists(mksquashfsPath)) {
+  if ((await isValidElf(runtimePath)) && (await fileExists(mksquashfsPath))) {
     console.log('AppImage runtime already cached.');
     return;
   }
@@ -38,11 +41,11 @@ export async function ensureAppImageRuntime(): Promise<void> {
     await extractArchive(archivePath);
     await fs.unlink(archivePath).catch(() => {});
 
-    if (!await isValidElf(runtimePath)) {
+    if (!(await isValidElf(runtimePath))) {
       throw new Error(`runtime-x64 is not a valid ELF binary after extraction`);
     }
 
-    if (!await fileExists(mksquashfsPath)) {
+    if (!(await fileExists(mksquashfsPath))) {
       throw new Error(`mksquashfs not found after extraction`);
     }
 

@@ -1,0 +1,29 @@
+# yaml-language-server: $schema=../schemas/tasks.schema.json
+tasks:
+    dev:unit:
+        name: Unit tests
+        description: Run unit tests with Vitest
+        environment: dev
+        cmds:
+            - npx vitest run --watch=false tests/unit
+
+    dev:e2e:
+        name: E2E tests
+        description: Run end-to-end tests with Vitest
+        environment: dev
+        cmds:
+            - npx vitest run --watch=false tests/e2e
+
+    dev:coverage:
+        name: Test coverage
+        description: Run unit tests with coverage report
+        environment: dev
+        cmds:
+            - npx vitest run --watch=false tests/unit --coverage
+
+    dev:watch:
+        name: Watch tests
+        description: Run unit tests in watch mode
+        environment: dev
+        cmds:
+            - npx vitest watch tests/unit

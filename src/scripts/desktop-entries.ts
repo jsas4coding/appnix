@@ -30,7 +30,7 @@ export async function generateDesktopEntries(): Promise<void> {
       const context = {
         ...app,
         bin_path: path.join(getBinPath(), app.app_name),
-        icon_path: path.join(getIconsPath(), `${app.app_name}.png`),
+        icon_path: path.join(getIconsPath(), `${app.icon || app.app_name}.png`),
       };
 
       const desktopEntryContent = await renderTemplate(

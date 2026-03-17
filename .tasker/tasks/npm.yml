@@ -1,0 +1,22 @@
+# yaml-language-server: $schema=../schemas/tasks.schema.json
+tasks:
+    dev:install:
+        name: Install dependencies
+        description: Install Node.js dependencies
+        environment: dev
+        cmds:
+            - npm install
+
+    dev:compile:
+        name: Compile TypeScript
+        description: Compile TypeScript source to JavaScript
+        environment: dev
+        cmds:
+            - tsc && tsc-alias
+
+    dev:clean:
+        name: Clean dist
+        description: Remove compiled output directory
+        environment: dev
+        cmds:
+            - npx rimraf dist

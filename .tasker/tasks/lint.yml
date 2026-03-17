@@ -1,0 +1,22 @@
+# yaml-language-server: $schema=../schemas/tasks.schema.json
+tasks:
+    dev:check:
+        name: Lint check
+        description: Run Biome linter and formatter checks
+        environment: dev
+        cmds:
+            - npx biome check .
+
+    dev:fix:
+        name: Lint fix
+        description: Run Biome linter with auto-fix
+        environment: dev
+        cmds:
+            - npx biome check --fix .
+
+    dev:format:
+        name: Format code
+        description: Format source files with Biome
+        environment: dev
+        cmds:
+            - npx biome format --write .
