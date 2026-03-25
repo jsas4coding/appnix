@@ -1,3 +1,5 @@
+# yaml-language-server: $schema=https://raw.githubusercontent.com/jsas4coding/appnix/refs/heads/main/config.schema.json
+
 defaults:
   electron_version: "41.0.3"
   lang: "en-US"
