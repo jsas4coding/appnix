@@ -21,8 +21,8 @@ tasks:
             - msg: 'Task appnix:dev:all requires ENV=dev (current: $ENV)'
               sh: test -z "$ENV" || test "$ENV" = "dev"
     appnix:dev:build:
-        desc: Build AppImages for all configured apps
-        summary: Build all apps - Build AppImages for all configured apps
+        desc: Build .deb packages for all configured apps
+        summary: Build all apps - Build .deb packages for all configured apps
         cmds:
             - appnix build
         preconditions:
@@ -53,8 +53,8 @@ tasks:
             - msg: 'Task appnix:dev:list requires ENV=dev (current: $ENV)'
               sh: test -z "$ENV" || test "$ENV" = "dev"
     appnix:dev:reinstall:
-        desc: Uninstall and rebuild a single app (kills running process)
-        summary: Reinstall app - Uninstall and rebuild a single app (kills running process)
+        desc: Uninstall and rebuild a single app
+        summary: Reinstall app - Uninstall and rebuild a single app
         cmds:
             - appnix reinstall {{.CLI_ARGS}}
         preconditions:
@@ -65,12 +65,14 @@ tasks:
         summary: Setup CLI - Compile TypeScript and install AppNix CLI to ~/.config/appnix
         cmds:
             - npm run setup
+        deps:
+            - npm:dev:compile
         preconditions:
             - msg: 'Task appnix:dev:setup requires ENV=dev (current: $ENV)'
               sh: test -z "$ENV" || test "$ENV" = "dev"
     appnix:dev:uninstall:
-        desc: Remove an installed app and its desktop entry
-        summary: Uninstall app - Remove an installed app and its desktop entry
+        desc: Remove an installed app and its .deb package
+        summary: Uninstall app - Remove an installed app and its .deb package
         cmds:
             - appnix uninstall {{.CLI_ARGS}}
         preconditions:
@@ -117,7 +119,7 @@ tasks:
         desc: Compile TypeScript source to JavaScript
         summary: Compile TypeScript - Compile TypeScript source to JavaScript
         cmds:
-            - tsc && tsc-alias
+            - npx tsc && npx tsc-alias
         preconditions:
             - msg: 'Task npm:dev:compile requires ENV=dev (current: $ENV)'
               sh: test -z "$ENV" || test "$ENV" = "dev"

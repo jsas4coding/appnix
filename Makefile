@@ -10,17 +10,17 @@ export
 .DEFAULT_GOAL := help
 
 help: ## Show available targets
-	@echo "appnix - appnix project tasks"
+	@echo "appnix - AppNix CLI — convert websites to Linux desktop apps (.deb)"
 	@echo ""
-	@echo "AppNix  Build, install and manage AppImage applications"
+	@echo "AppNix  Build, install and manage .deb desktop applications"
 	@echo "  appnix-dev-all                 Build all apps and generate desktop entries"
-	@echo "  appnix-dev-build               Build AppImages for all configured apps"
+	@echo "  appnix-dev-build               Build .deb packages for all configured apps"
 	@echo "  appnix-dev-desktop             Generate .desktop entries for all configured apps"
 	@echo "  appnix-dev-install             Build and install a single app by name"
 	@echo "  appnix-dev-list                Show all installed AppNix applications"
-	@echo "  appnix-dev-reinstall           Uninstall and rebuild a single app (kills running process)"
+	@echo "  appnix-dev-reinstall           Uninstall and rebuild a single app"
 	@echo "  appnix-dev-setup               Compile TypeScript and install AppNix CLI to ~/.config/appnix"
-	@echo "  appnix-dev-uninstall           Remove an installed app and its desktop entry"
+	@echo "  appnix-dev-uninstall           Remove an installed app and its .deb package"
 	@echo ""
 	@echo "Lint  Code quality checks and formatting with Biome"
 	@echo "  lint-dev-check                 Run Biome linter and formatter checks"
@@ -51,7 +51,7 @@ appnix-dev-all: ## Build all apps and generate desktop entries
 	@if [ -n "$$ENV" ] && [ "$$ENV" != "dev" ]; then echo "Task appnix:dev:all requires ENV=dev (current: $$ENV)"; exit 1; fi
 	appnix all
 
-appnix-dev-build: ## Build AppImages for all configured apps
+appnix-dev-build: ## Build .deb packages for all configured apps
 	@if [ -n "$$ENV" ] && [ "$$ENV" != "dev" ]; then echo "Task appnix:dev:build requires ENV=dev (current: $$ENV)"; exit 1; fi
 	appnix build
 
@@ -67,7 +67,7 @@ appnix-dev-list: ## Show all installed AppNix applications
 	@if [ -n "$$ENV" ] && [ "$$ENV" != "dev" ]; then echo "Task appnix:dev:list requires ENV=dev (current: $$ENV)"; exit 1; fi
 	appnix list
 
-appnix-dev-reinstall: ## Uninstall and rebuild a single app (kills running process)
+appnix-dev-reinstall: ## Uninstall and rebuild a single app
 	@if [ -n "$$ENV" ] && [ "$$ENV" != "dev" ]; then echo "Task appnix:dev:reinstall requires ENV=dev (current: $$ENV)"; exit 1; fi
 	appnix reinstall {{.CLI_ARGS}}
 
@@ -75,7 +75,7 @@ appnix-dev-setup: ## Compile TypeScript and install AppNix CLI to ~/.config/appn
 	@if [ -n "$$ENV" ] && [ "$$ENV" != "dev" ]; then echo "Task appnix:dev:setup requires ENV=dev (current: $$ENV)"; exit 1; fi
 	npm run setup
 
-appnix-dev-uninstall: ## Remove an installed app and its desktop entry
+appnix-dev-uninstall: ## Remove an installed app and its .deb package
 	@if [ -n "$$ENV" ] && [ "$$ENV" != "dev" ]; then echo "Task appnix:dev:uninstall requires ENV=dev (current: $$ENV)"; exit 1; fi
 	appnix uninstall {{.CLI_ARGS}}
 
@@ -97,7 +97,7 @@ npm-dev-clean: ## Remove compiled output directory
 
 npm-dev-compile: ## Compile TypeScript source to JavaScript
 	@if [ -n "$$ENV" ] && [ "$$ENV" != "dev" ]; then echo "Task npm:dev:compile requires ENV=dev (current: $$ENV)"; exit 1; fi
-	tsc && tsc-alias
+	npx tsc && npx tsc-alias
 
 npm-dev-install: ## Install Node.js dependencies
 	@if [ -n "$$ENV" ] && [ "$$ENV" != "dev" ]; then echo "Task npm:dev:install requires ENV=dev (current: $$ENV)"; exit 1; fi

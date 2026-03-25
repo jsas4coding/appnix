@@ -4,12 +4,14 @@ tasks:
         name: Setup CLI
         description: Compile TypeScript and install AppNix CLI to ~/.config/appnix
         environment: dev
+        deps:
+            - npm:dev:compile
         cmds:
             - npm run setup
 
     dev:build:
         name: Build all apps
-        description: Build AppImages for all configured apps
+        description: Build .deb packages for all configured apps
         environment: dev
         cmds:
             - appnix build
@@ -23,14 +25,14 @@ tasks:
 
     dev:reinstall:
         name: Reinstall app
-        description: Uninstall and rebuild a single app (kills running process)
+        description: Uninstall and rebuild a single app
         environment: dev
         cmds:
             - appnix reinstall {{.CLI_ARGS}}
 
     dev:uninstall:
         name: Uninstall app
-        description: Remove an installed app and its desktop entry
+        description: Remove an installed app and its .deb package
         environment: dev
         cmds:
             - appnix uninstall {{.CLI_ARGS}}

@@ -1,6 +1,6 @@
 # yaml-language-server: $schema=schemas/tasker.schema.json
 name: appnix
-description: appnix project tasks
+description: AppNix CLI — convert websites to Linux desktop apps (.deb)
 version: "3"
 environments:
     dev:
@@ -27,7 +27,7 @@ vars:
 groups:
     appnix:
         name: AppNix
-        description: Build, install and manage AppImage applications
+        description: Build, install and manage .deb desktop applications
     npm:
         name: Node.js
         description: Node.js build, setup and dependency management

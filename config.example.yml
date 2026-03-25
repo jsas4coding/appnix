@@ -1,6 +1,7 @@
 defaults:
-  electron_version: "40.6.1"
+  electron_version: "41.0.3"
   lang: "en-US"
+  maintainer: "Your Name <your@email.com>"
   spellcheck:
     - "en-US"
     - "pt-BR"

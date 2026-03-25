@@ -13,6 +13,7 @@ describe('Desktop Integration', () => {
       electron_version: '24.0.0',
       lang: 'en-US',
       spellcheck: ['en-US'],
+      maintainer: 'Test User <test@example.com>',
     },
     apps: [
       {
@@ -21,7 +22,7 @@ describe('Desktop Integration', () => {
         app_name: 'test-app',
         category: 'Utility',
         description: 'A test application',
-        icon: '/path/to/icon.png',
+        icon: 'test-app',
       },
     ],
   };
@@ -33,10 +34,9 @@ describe('Desktop Integration', () => {
     vi.spyOn(fs, 'mkdir').mockResolvedValue(undefined);
     vi.spyOn(templateUtils, 'renderTemplate').mockResolvedValue('Desktop Entry Content');
     vi.spyOn(fs, 'writeFile').mockResolvedValue(undefined);
-    vi.spyOn(process, 'env', 'get').mockReturnValue({ HOME: '/home/testuser' });
   });
 
-  it('should generate desktop entries for all configured apps', async () => {
+  it('should generate desktop entries with /opt/ bin path', async () => {
     await generateDesktopEntries();
 
     expect(configUtils.loadConfig).toHaveBeenCalled();
@@ -47,7 +47,9 @@ describe('Desktop Integration', () => {
     );
     expect(templateUtils.renderTemplate).toHaveBeenCalledWith(
       expect.stringContaining('desktop/entry.hbs'),
-      mockConfig.apps[0],
+      expect.objectContaining({
+        bin_path: '/opt/Test App/test-app',
+      }),
     );
     expect(fs.writeFile).toHaveBeenCalledWith(
       expect.stringContaining('test-app.desktop'),

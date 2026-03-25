@@ -4,21 +4,27 @@ import { build } from 'electron-builder';
 import type { MockInstance } from 'vitest';
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 
-import { buildAppImages } from '@/builder/build';
+import { buildAllApps } from '@/builder/build';
+import * as setupUtils from '@/builder/setup';
 import * as configUtils from '@/utils/config';
+import * as installedUtils from '@/utils/installed';
 import * as templateUtils from '@/utils/template';
 
-// Mock electron-builder
 vi.mock('electron-builder', () => ({
   build: vi.fn(),
 }));
 
-describe('AppImage Build Process', () => {
+vi.mock('node:child_process', () => ({
+  execSync: vi.fn(),
+}));
+
+describe('Deb Build Process', () => {
   const mockConfig = {
     defaults: {
       electron_version: '24.0.0',
       lang: 'en-US',
       spellcheck: ['en-US'],
+      maintainer: 'Test User <test@example.com>',
     },
     apps: [
       {
@@ -27,8 +33,7 @@ describe('AppImage Build Process', () => {
         app_name: 'test-app',
         category: 'Utility',
         description: 'A test application',
-        icon: '/path/to/icon.png',
-        window: { width: 1024, height: 768 },
+        icon: 'test-icon',
       },
     ],
   };
@@ -40,10 +45,18 @@ describe('AppImage Build Process', () => {
     vi.clearAllMocks();
     mockConsoleError = vi.spyOn(console, 'error').mockImplementation(() => undefined);
     mockConsoleLog = vi.spyOn(console, 'log').mockImplementation(() => undefined);
+    vi.spyOn(setupUtils, 'ensureDebDependencies').mockResolvedValue(undefined);
     vi.spyOn(configUtils, 'loadConfig').mockResolvedValue(mockConfig as any);
     vi.spyOn(configUtils, 'validateConfig').mockReturnValue(true);
     vi.spyOn(fs, 'mkdir').mockResolvedValue(undefined as any);
+    vi.spyOn(fs, 'rm').mockResolvedValue(undefined as any);
+    vi.spyOn(fs, 'copyFile').mockResolvedValue(undefined as any);
+    vi.spyOn(fs, 'access').mockRejectedValue(new Error('not found'));
+    vi.spyOn(fs, 'readdir').mockResolvedValue([
+      { name: 'test-app.deb', isFile: () => true, isDirectory: () => false },
+    ] as any);
     vi.spyOn(templateUtils, 'generateElectronApp').mockResolvedValue(undefined as any);
+    vi.spyOn(installedUtils, 'registerApp').mockResolvedValue(undefined as any);
     (build as any).mockResolvedValue(undefined);
   });
 
@@ -52,9 +65,10 @@ describe('AppImage Build Process', () => {
     mockConsoleLog.mockRestore();
   });
 
-  it('should build AppImages for all configured apps', async () => {
-    await buildAppImages();
+  it('should build .deb packages for all configured apps', async () => {
+    await buildAllApps();
 
+    expect(setupUtils.ensureDebDependencies).toHaveBeenCalled();
     expect(configUtils.loadConfig).toHaveBeenCalled();
     expect(configUtils.validateConfig).toHaveBeenCalledWith(mockConfig);
     expect(templateUtils.generateElectronApp).toHaveBeenCalledWith(
@@ -66,17 +80,14 @@ describe('AppImage Build Process', () => {
         config: expect.objectContaining({
           appId: 'com.appnix.test-app',
           productName: 'Test App',
+          deb: { packageName: 'appnix-test-app', maintainer: 'Test User <test@example.com>' },
         }),
-        linux: ['AppImage'],
+        linux: ['deb'],
       }),
     );
-    expect(mockConsoleLog).toHaveBeenCalledWith(
-      expect.stringContaining('Built AppImage for Test App'),
-    );
-    expect(mockConsoleLog).toHaveBeenCalledWith('All AppImages built successfully');
   });
 
-  it('should build AppImages for multiple apps', async () => {
+  it('should build .deb packages for multiple apps', async () => {
     const multiConfig = {
       ...mockConfig,
       apps: [
@@ -87,30 +98,25 @@ describe('AppImage Build Process', () => {
           app_name: 'another-app',
           category: 'Utility',
           description: 'Another test application',
-          icon: '/path/to/icon2.png',
-          window: { width: 800, height: 600 },
+          icon: 'another-icon',
         },
       ],
     };
     vi.spyOn(configUtils, 'loadConfig').mockResolvedValue(multiConfig as any);
 
-    await buildAppImages();
+    await buildAllApps();
 
     expect(templateUtils.generateElectronApp).toHaveBeenCalledTimes(2);
     expect(build).toHaveBeenCalledTimes(2);
-    expect(mockConsoleLog).toHaveBeenCalledWith(
-      expect.stringContaining('Built AppImage for Another App'),
-    );
-    expect(mockConsoleLog).toHaveBeenCalledWith('All AppImages built successfully');
   });
 
   it('should throw error for invalid configuration', async () => {
     vi.spyOn(configUtils, 'validateConfig').mockReturnValue(false);
-    await expect(buildAppImages()).rejects.toThrow('Invalid configuration');
+    await expect(buildAllApps()).rejects.toThrow('Invalid configuration');
   });
 
   it('should handle errors during build process', async () => {
     (build as any).mockRejectedValue(new Error('Build failed'));
-    await expect(buildAppImages()).rejects.toThrow('Build failed');
+    await expect(buildAllApps()).rejects.toThrow('Build failed');
   });
 });

@@ -1,12 +1,13 @@
 import path from 'node:path';
-import tsconfigPaths from 'vite-tsconfig-paths';
 import { defineConfig } from 'vitest/config';
 
 export default defineConfig({
-  plugins: [tsconfigPaths()],
   test: {
     globals: true,
     environment: 'node',
+    env: {
+      APPNIX_ENV: 'test',
+    },
     coverage: {
       provider: 'v8',
       reporter: ['text', 'html', 'lcov'],
@@ -15,6 +16,7 @@ export default defineConfig({
     },
   },
   resolve: {
+    tsconfigPaths: true,
     alias: {
       '@': path.resolve(__dirname, './src'),
     },

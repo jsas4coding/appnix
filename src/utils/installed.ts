@@ -8,6 +8,7 @@ export interface InstalledApp {
   url: string;
   category: string;
   description: string;
+  debPackage: string;
   paths: {
     bin: string;
     desktop: string;

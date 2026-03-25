@@ -1,15 +1,14 @@
 # AppNix
 
-Convert websites to Linux desktop AppImages.
+Personal tool to convert websites into Linux desktop apps (.deb).
 
-Define your apps in YAML, and AppNix generates Electron wrappers, builds portable AppImages, and creates `.desktop` entries for seamless OS integration.
+Define your apps in YAML, and AppNix generates Electron wrappers, builds `.deb` packages, and creates `.desktop` entries for seamless OS integration.
 
 ## Requirements
 
 - Node.js >= 24.0.0
 - Linux operating system
-- `7z` (p7zip-full) — extract AppImage runtime
-- `gh` or `curl` — download AppImage runtime from GitHub
+- `dpkg` — install and manage `.deb` packages
 
 ## Quick Start
 
@@ -20,14 +19,23 @@ npm run setup
 # Edit your config
 nano ~/.config/appnix/config.yml
 
+# Build and install a single app
+appnix install whatsapp
+
 # Build all apps
 appnix build
 
 # List installed apps
 appnix list
 
+# Reinstall an app (uninstall + rebuild)
+appnix reinstall todoist
+
 # Uninstall an app
-appnix uninstall <app_name>
+appnix uninstall todoist
+
+# Uninstall everything
+appnix uninstall all
 ```
 
 ## Configuration
@@ -36,22 +44,39 @@ Apps are defined in `~/.config/appnix/config.yml`:
 
 ```yaml
 defaults:
-  electron_version: '41.0.2'
-  lang: 'en-US'
+  electron_version: "41.0.2"
+  maintainer: "Your Name <your@email.com>"
+  lang: "en-US"
   spellcheck:
-    - 'en-US'
-    - 'pt-BR'
+    - "en-US"
+    - "pt-BR"
 
 apps:
-  - name: 'WhatsApp'
-    url: 'https://web.whatsapp.com'
-    icon: 'whatsapp'
-    app_name: 'whatsapp'
-    category: 'Network;InstantMessaging;Chat'
-    description: 'Messaging, voice and video calls'
+  - name: "WhatsApp"
+    url: "https://web.whatsapp.com"
+    icon: "whatsapp"
+    app_name: "whatsapp"
+    category: "Network;InstantMessaging;Chat"
+    description: "End-to-end encrypted messaging, voice and video calls"
+    keywords:
+      - "messaging"
+      - "chat"
+      - "calls"
 ```
 
-See `config.example.yml` for a complete example.
+See [`config.example.yml`](config.example.yml) for a schema reference and [`config.schema.json`](config.schema.json) for JSON Schema validation.
+
+### Configuration Fields
+
+| Field | Required | Description |
+|-------|----------|-------------|
+| `name` | Yes | Display name for desktop entry |
+| `url` | Yes | URL loaded by the Electron wrapper |
+| `app_name` | Yes | Machine identifier (lowercase, hyphens) |
+| `icon` | No | Icon filename (without extension) from `~/.config/appnix/icons/` |
+| `category` | Yes | FreeDesktop.org menu categories (`;` separated) |
+| `description` | Yes | Short description for package metadata |
+| `keywords` | No | Search keywords for desktop discovery |
 
 ## Electron Features
 
@@ -76,12 +101,29 @@ Generated apps include production-ready Electron features:
 ## Development
 
 ```bash
-npm run lint          # Lint with Biome
-npm run format        # Format with Biome
-npm run test          # Unit tests
-npm run test:coverage # Unit tests with coverage
-npm run test:e2e      # End-to-end tests
+npm install             # Install dependencies
+npm run lint            # Lint with Biome
+npm run lint:fix        # Auto-fix lint issues
+npm run format          # Format with Biome
+npm run test            # Unit tests
+npm run test:coverage   # Unit tests with coverage
+npm run test:e2e        # End-to-end tests
+npm run test:watch      # Watch mode
 ```
+
+### Task Runner
+
+This project uses [Tasker](https://github.com/user/tasker) for task automation:
+
+```bash
+task appnix:dev:setup       # Compile and install CLI
+task appnix:dev:install     # Install a single app
+task appnix:dev:build       # Build all apps
+task lint:dev:check         # Run linter
+task test:dev:unit          # Run unit tests
+```
+
+Run `tasker list` for all available tasks.
 
 ## Documentation
 

@@ -6,13 +6,8 @@ import Handlebars from 'handlebars';
 import type { AppConfig } from '../types/config.js';
 
 Handlebars.registerHelper('json', (context) => JSON.stringify(context));
-import {
-  getBinPath,
-  getDesktopEntriesPath,
-  getIconsPath,
-  getStagingPath,
-  getTemplatesPath,
-} from './config.js';
+
+import { getDesktopEntriesPath, getIconsPath, getStagingPath, getTemplatesPath } from './config.js';
 
 /**
  * Renders a Handlebars template with the provided context.
@@ -48,7 +43,7 @@ export async function generateElectronApp(
     electron_version: defaults.electron_version,
     lang: defaults.lang,
     spellcheck: defaults.spellcheck,
-    bin_path: path.join(getBinPath(), app.app_name),
+    bin_path: `/opt/${app.name}/${app.app_name}`,
     icon_path: path.join(getIconsPath(), `${app.icon}.png`),
   };
 

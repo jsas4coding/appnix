@@ -2,7 +2,7 @@ import { execSync } from 'node:child_process';
 import fs from 'node:fs/promises';
 import path from 'node:path';
 
-import { getBinPath, getLibPath } from '@/utils/config.js';
+import { getLibPath, getPackagesPath } from '@/utils/config.js';
 
 /**
  * Installs the AppNix CLI by copying compiled files to ~/.config/appnix/lib/
@@ -10,7 +10,7 @@ import { getBinPath, getLibPath } from '@/utils/config.js';
  */
 export async function setupCli(): Promise<void> {
   const libPath = getLibPath();
-  const binPath = getBinPath();
+  const packagesPath = getPackagesPath();
   const projectRoot = process.cwd();
   const distPath = path.join(projectRoot, 'dist');
   const templatesSource = path.join(projectRoot, 'src', 'templates');
@@ -19,7 +19,7 @@ export async function setupCli(): Promise<void> {
 
   // 1. Create directories
   await fs.mkdir(libPath, { recursive: true });
-  await fs.mkdir(binPath, { recursive: true });
+  await fs.mkdir(packagesPath, { recursive: true });
 
   // 2. Copy dist/ → lib/ (compiled JS)
   console.log(`Copying compiled files to ${libPath}`);

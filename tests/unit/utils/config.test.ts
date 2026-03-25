@@ -12,6 +12,7 @@ describe('Configuration Utility', () => {
       electron_version: '24.0.0',
       lang: 'en-US',
       spellcheck: ['en-US'],
+      maintainer: 'Test User <test@example.com>',
     },
     apps: [
       {

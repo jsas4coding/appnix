@@ -3,6 +3,7 @@ export interface AppConfig {
     electron_version: string;
     lang: string;
     spellcheck: string[];
+    maintainer: string;
   };
   apps: Array<{
     name: string;

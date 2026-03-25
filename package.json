@@ -1,7 +1,7 @@
 {
   "name": "appnix",
-  "version": "0.1.0",
-  "description": "Convert websites to Linux desktop AppImages",
+  "version": "1.0.0",
+  "description": "Convert websites to Linux desktop apps (.deb)",
   "type": "module",
   "engines": {
     "node": ">=24.0.0"
@@ -19,18 +19,17 @@
     "test:watch": "vitest watch tests/unit"
   },
   "dependencies": {
-    "electron-builder": "^24.6.4",
+    "electron-builder": "^26.8.1",
     "handlebars": "^4.7.8",
-    "yaml": "^2.3.4"
+    "yaml": "^2.8.3"
   },
   "devDependencies": {
-    "@biomejs/biome": "^2.3.14",
-    "@types/node": "^24.0.0",
-    "@vitest/coverage-v8": "^1.6.0",
-    "rimraf": "^5.0.5",
+    "@biomejs/biome": "^2.4.8",
+    "@types/node": "^24.12.0",
+    "@vitest/coverage-v8": "^4.1.1",
+    "rimraf": "^6.1.3",
     "tsc-alias": "^1.8.10",
-    "typescript": "^5.4.5",
-    "vite-tsconfig-paths": "^5.1.4",
-    "vitest": "^1.6.0"
+    "typescript": "^5.9.3",
+    "vitest": "^4.1.1"
   }
 }

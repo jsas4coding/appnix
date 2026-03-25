@@ -1,0 +1,108 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://appnix.odara.dev/config.schema.json",
+  "title": "AppNix Configuration",
+  "description": "Schema for AppNix config.yml — defines defaults and app entries for building Electron .deb packages.",
+  "type": "object",
+  "required": ["defaults", "apps"],
+  "additionalProperties": false,
+  "properties": {
+    "defaults": {
+      "type": "object",
+      "description": "Global defaults applied to all app builds.",
+      "required": ["electron_version", "lang", "maintainer", "spellcheck"],
+      "additionalProperties": false,
+      "properties": {
+        "electron_version": {
+          "type": "string",
+          "description": "Electron version used to build all apps.",
+          "pattern": "^\\d+\\.\\d+\\.\\d+$",
+          "examples": ["41.0.2"]
+        },
+        "lang": {
+          "type": "string",
+          "description": "Default language/locale for the Electron shell.",
+          "pattern": "^[a-z]{2}-[A-Z]{2}$",
+          "examples": ["en-US", "pt-BR"]
+        },
+        "maintainer": {
+          "type": "string",
+          "description": "Package maintainer in 'Name <email>' format for .deb metadata.",
+          "pattern": "^.+ <.+@.+>$",
+          "examples": ["Odara Development <hi@odara.dev>"]
+        },
+        "spellcheck": {
+          "type": "array",
+          "description": "List of locale codes enabled for spellcheck.",
+          "items": {
+            "type": "string",
+            "pattern": "^[a-z]{2}-[A-Z]{2}$"
+          },
+          "minItems": 1,
+          "uniqueItems": true,
+          "examples": [["en-US", "pt-BR"]]
+        }
+      }
+    },
+    "apps": {
+      "type": "array",
+      "description": "List of web apps to package as Electron .deb applications.",
+      "minItems": 1,
+      "items": {
+        "type": "object",
+        "required": ["name", "url", "app_name", "category", "description"],
+        "additionalProperties": false,
+        "properties": {
+          "name": {
+            "type": "string",
+            "description": "Human-readable display name shown in the desktop entry.",
+            "minLength": 1,
+            "examples": ["Google Drive", "WhatsApp"]
+          },
+          "url": {
+            "type": "string",
+            "description": "URL loaded by the Electron wrapper.",
+            "format": "uri",
+            "pattern": "^https?://",
+            "examples": ["https://drive.google.com"]
+          },
+          "icon": {
+            "type": "string",
+            "description": "Icon filename (without extension) from the icons directory.",
+            "pattern": "^[a-z0-9][a-z0-9-]*$",
+            "examples": ["drive", "globo-play"]
+          },
+          "app_name": {
+            "type": "string",
+            "description": "Machine identifier used for package name, binary and paths. Must be lowercase alphanumeric with hyphens.",
+            "pattern": "^[a-z0-9][a-z0-9-]*$",
+            "examples": ["drive", "haven-webmail"]
+          },
+          "category": {
+            "type": "string",
+            "description": "FreeDesktop.org menu categories separated by semicolons.",
+            "pattern": "^[A-Za-z]+(;[A-Za-z]+)*$",
+            "examples": ["Office;Network;Email", "Development;Database;Network"]
+          },
+          "description": {
+            "type": "string",
+            "description": "Short description for the desktop entry and package metadata.",
+            "minLength": 10,
+            "maxLength": 128,
+            "examples": ["Cloud file storage, sync and real-time collaboration"]
+          },
+          "keywords": {
+            "type": "array",
+            "description": "Search keywords for desktop environment discovery.",
+            "items": {
+              "type": "string",
+              "minLength": 1
+            },
+            "uniqueItems": true,
+            "examples": [["google", "cloud", "storage"]]
+          }
+        }
+      }
+    }
+  }
+}

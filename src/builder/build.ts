@@ -7,49 +7,43 @@ import { build } from 'electron-builder';
 
 import type { AppConfig } from '@/types/config.js';
 import {
-  getBinPath,
   getDesktopEntriesPath,
   getIconsPath,
+  getPackagesPath,
   getStagingPath,
   loadConfig,
   validateConfig,
 } from '@/utils/config.js';
 import { registerApp } from '@/utils/installed.js';
 import { generateElectronApp } from '@/utils/template.js';
-import { CACHE_DIR, ensureAppImageRuntime } from './setup.js';
+import { ensureDebDependencies } from './setup.js';
 
 /**
- * Builds and installs a single app as an AppImage.
+ * Builds and installs a single app as a .deb package.
  *
  * 1. Generate Electron files in staging (~/.config/appnix/.build/{app_name})
  * 2. Install dependencies in staging
- * 3. Build AppImage via electron-builder (output to staging)
- * 4. Move final AppImage to ~/.config/appnix/bin/{app_name}
- * 5. Register in installed.json
- * 6. Clean up staging for this app
+ * 3. Build .deb via electron-builder (output to staging)
+ * 4. Install .deb via dpkg -i
+ * 5. Copy .deb to ~/.config/appnix/packages/ for reference
+ * 6. Register in installed.json
+ * 7. Clean up staging for this app
  */
 export async function buildSingleApp(
   app: AppConfig['apps'][0],
   defaults: AppConfig['defaults'],
 ): Promise<void> {
   const stagingPath = getStagingPath();
-  const binPath = getBinPath();
+  const packagesPath = getPackagesPath();
   const iconsPath = getIconsPath();
   const desktopPath = getDesktopEntriesPath();
 
-  await fs.mkdir(binPath, { recursive: true });
+  await fs.mkdir(packagesPath, { recursive: true });
   await fs.mkdir(iconsPath, { recursive: true });
 
-  console.log(`\n── Building ${app.name} ──`);
+  const debPackageName = `appnix-${app.app_name}`;
 
-  // 0. Kill running process to prevent ETXTBSY when overwriting binary
-  const finalBinCheck = path.join(binPath, app.app_name);
-  try {
-    execSync(`pkill -f "${finalBinCheck}"`, { stdio: 'ignore' });
-    console.log(`Stopped running ${app.name} process`);
-  } catch {
-    // App may not be running — ignore
-  }
+  console.log(`\n── Building ${app.name} ──`);
 
   // 1. Generate Electron app files in staging
   await generateElectronApp(app, defaults);
@@ -61,7 +55,7 @@ export async function buildSingleApp(
   console.log(`Installing dependencies...`);
   execSync('npm install --ignore-scripts', { cwd: appStagingDir, stdio: 'inherit' });
 
-  // 3. Build AppImage via electron-builder
+  // 3. Build .deb via electron-builder
   const buildConfig: Configuration = {
     appId: `com.appnix.${app.app_name}`,
     productName: app.name,
@@ -71,30 +65,38 @@ export async function buildSingleApp(
       app: appStagingDir,
     },
     linux: {
-      target: ['AppImage'],
+      target: ['deb'],
       category: app.category,
       icon: path.join(getIconsPath(), `${app.icon}.png`),
+      packageCategory: app.category,
+    },
+    deb: {
+      packageName: debPackageName,
+      maintainer: defaults.maintainer,
     },
     files: ['**/*', '!**/*.ts', '!tsconfig.json', '!package-lock.json'],
   };
 
   await build({
     config: buildConfig,
-    linux: ['AppImage'],
+    linux: ['deb'],
   });
 
-  // 4. Find and move AppImage to bin/
-  const appImageFile = await findAppImage(buildOutputDir);
-  if (!appImageFile) {
-    throw new Error(`AppImage not found in build output for ${app.name}`);
+  // 4. Find and install .deb
+  const debFile = await findDebPackage(buildOutputDir);
+  if (!debFile) {
+    throw new Error(`.deb package not found in build output for ${app.name}`);
   }
 
-  const finalBinPath = path.join(binPath, app.app_name);
-  await fs.copyFile(appImageFile, finalBinPath);
-  await fs.chmod(finalBinPath, 0o755);
-  console.log(`Installed: ${finalBinPath}`);
+  console.log(`Installing ${app.name} via dpkg...`);
+  execSync(`sudo dpkg -i "${debFile}"`, { stdio: 'inherit' });
 
-  // 5. Register in installed.json
+  // 5. Copy .deb to packages/ for reference
+  const savedDebPath = path.join(packagesPath, `${debPackageName}.deb`);
+  await fs.copyFile(debFile, savedDebPath);
+
+  // 6. Register in installed.json
+  const binPath = `/opt/${app.name}/${app.app_name}`;
   const desktopEntryPath = path.join(desktopPath, `${app.app_name}.desktop`);
   const iconPath = path.join(iconsPath, `${app.icon || app.app_name}.png`);
   const hasIcon = await fileExists(iconPath);
@@ -105,26 +107,27 @@ export async function buildSingleApp(
     url: app.url,
     category: app.category || '',
     description: app.description || '',
+    debPackage: debPackageName,
     paths: {
-      bin: finalBinPath,
+      bin: binPath,
       desktop: desktopEntryPath,
       icon: hasIcon ? iconPath : null,
     },
     installedAt: new Date().toISOString(),
   });
 
-  // 6. Clean up staging for this app
+  // 7. Clean up staging for this app
   await fs.rm(appStagingDir, { recursive: true, force: true });
   await fs.rm(buildOutputDir, { recursive: true, force: true });
   console.log(`Cleaned staging for ${app.name}`);
 }
 
 /**
- * Builds AppImage files for all configured apps.
+ * Builds .deb packages for all configured apps.
  */
-export async function buildAppImages() {
+export async function buildAllApps() {
   try {
-    await ensureAppImageRuntime();
+    await ensureDebDependencies();
 
     const config = await loadConfig();
     if (!validateConfig(config)) {
@@ -135,14 +138,13 @@ export async function buildAppImages() {
       await buildSingleApp(app, config.defaults);
     }
 
-    // Final cleanup: remove .build directory and runtime cache
+    // Final cleanup: remove .build directory
     await fs.rm(getStagingPath(), { recursive: true, force: true });
-    await fs.rm(CACHE_DIR, { recursive: true, force: true });
     console.log('\nAll apps built and installed successfully.');
   } catch (error) {
     // Clean up staging on failure
     await fs.rm(getStagingPath(), { recursive: true, force: true }).catch(() => {});
-    console.error('Error building AppImages:', error);
+    console.error('Error building apps:', error);
     throw error;
   }
 }
@@ -165,12 +167,11 @@ export async function buildAppByName(appName: string): Promise<void> {
   }
 
   try {
-    await ensureAppImageRuntime();
+    await ensureDebDependencies();
     await buildSingleApp(app, config.defaults);
 
-    // Cleanup staging and cache
+    // Cleanup staging
     await fs.rm(getStagingPath(), { recursive: true, force: true });
-    await fs.rm(CACHE_DIR, { recursive: true, force: true });
     console.log(`\n${app.name} built and installed successfully.`);
   } catch (error) {
     await fs.rm(getStagingPath(), { recursive: true, force: true }).catch(() => {});
@@ -180,17 +181,17 @@ export async function buildAppByName(appName: string): Promise<void> {
 }
 
 /**
- * Finds the first .AppImage file in a directory (recursively).
+ * Finds the first .deb file in a directory (recursively).
  */
-async function findAppImage(dir: string): Promise<string | null> {
+async function findDebPackage(dir: string): Promise<string | null> {
   const entries = await fs.readdir(dir, { withFileTypes: true });
   for (const entry of entries) {
     const fullPath = path.join(dir, entry.name);
-    if (entry.isFile() && entry.name.endsWith('.AppImage')) {
+    if (entry.isFile() && entry.name.endsWith('.deb')) {
       return fullPath;
     }
     if (entry.isDirectory()) {
-      const found = await findAppImage(fullPath);
+      const found = await findDebPackage(fullPath);
       if (found) {
         return found;
       }

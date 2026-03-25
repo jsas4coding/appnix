@@ -35,9 +35,17 @@ export function getStagingPath(): string {
 }
 
 /**
- * Returns the path where final AppImage binaries are stored (~/.config/appnix/bin).
+ * Returns the path where built .deb packages are stored (~/.config/appnix/packages).
  */
-export function getBinPath(): string {
+export function getPackagesPath(): string {
+  return path.join(APPNIX_DIR, 'packages');
+}
+
+/**
+ * Returns the legacy bin path (~/.config/appnix/bin) used by the old AppImage format.
+ * Used only for cleanup during migration.
+ */
+export function getLegacyBinPath(): string {
   return path.join(APPNIX_DIR, 'bin');
 }
 
@@ -115,7 +123,7 @@ export function validateConfig(config: AppConfig): boolean {
     return false;
   }
 
-  const { electron_version, lang, spellcheck } = config.defaults;
+  const { electron_version, lang, maintainer, spellcheck } = config.defaults;
 
   if (typeof electron_version !== 'string') {
     console.error('Invalid configuration: electron_version must be a string');
@@ -124,6 +132,13 @@ export function validateConfig(config: AppConfig): boolean {
 
   if (typeof lang !== 'string') {
     console.error('Invalid configuration: lang must be a string');
+    return false;
+  }
+
+  if (typeof maintainer !== 'string') {
+    console.error(
+      'Invalid configuration: maintainer must be a string (e.g. "Name <email@example.com>")',
+    );
     return false;
   }
 

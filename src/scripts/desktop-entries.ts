@@ -2,7 +2,6 @@ import fs from 'node:fs/promises';
 import path from 'node:path';
 
 import {
-  getBinPath,
   getDesktopEntriesPath,
   getIconsPath,
   getTemplatesPath,
@@ -14,7 +13,8 @@ import { renderTemplate } from '@/utils/template.js';
 /**
  * Generates and installs desktop entries for all configured applications.
  *
- * Renders .desktop files using Handlebars templates with full bin/icon paths.
+ * The .deb package already includes desktop entries, but this command
+ * can be used to regenerate them manually if needed.
  */
 export async function generateDesktopEntries(): Promise<void> {
   try {
@@ -29,7 +29,7 @@ export async function generateDesktopEntries(): Promise<void> {
     for (const app of config.apps) {
       const context = {
         ...app,
-        bin_path: path.join(getBinPath(), app.app_name),
+        bin_path: `/opt/${app.name}/${app.app_name}`,
         icon_path: path.join(getIconsPath(), `${app.icon || app.app_name}.png`),
       };
 

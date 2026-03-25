@@ -7,17 +7,18 @@ const [command, ...args] = positionals;
 
 function showHelp(): void {
   console.log(`
-AppNix — Convert websites to Linux desktop AppImages
+AppNix — Convert websites to Linux desktop apps (.deb)
 
 Usage: appnix <command> [options]
 
 Commands:
-  build              Build AppImages for all configured apps
+  build              Build .deb packages for all configured apps
   install <name>     Build and install a single app
-  reinstall <name>   Uninstall and rebuild an app (kills running process)
+  reinstall <name>   Uninstall and rebuild an app
   list               List installed apps
   uninstall <name>   Uninstall an app by name
-  desktop            Generate desktop entries
+  uninstall all      Uninstall all apps (including legacy AppImage)
+  desktop            Regenerate desktop entries
   all                Build all apps and generate desktop entries
 
 Examples:
@@ -31,8 +32,8 @@ Examples:
 
 switch (command) {
   case 'build': {
-    const { buildAppImages } = await import('@/builder/build.js');
-    await buildAppImages();
+    const { buildAllApps } = await import('@/builder/build.js');
+    await buildAllApps();
     break;
   }
   case 'install': {
@@ -51,9 +52,10 @@ switch (command) {
       console.error('Error: app name is required.\nUsage: appnix reinstall <name>');
       process.exit(1);
     }
-    // Kill running process to prevent ETXTBSY when overwriting binary
+    // Kill running Electron app to prevent ETXTBSY when overwriting binary
+    // Use appnix-specific pattern to avoid killing the CLI process itself
     try {
-      execSync(`pkill -f ${name}`, { stdio: 'ignore' });
+      execSync(`pkill -f "appnix-${name}|com\\.appnix\\.${name}"`, { stdio: 'ignore' });
     } catch {
       // App may not be running — ignore
     }
@@ -71,11 +73,16 @@ switch (command) {
   case 'uninstall': {
     const name = args[0];
     if (!name) {
-      console.error('Error: app name is required.\nUsage: appnix uninstall <name>');
+      console.error('Error: app name is required.\nUsage: appnix uninstall <name|all>');
       process.exit(1);
     }
-    const { uninstallApp } = await import('@/scripts/install.js');
-    await uninstallApp(name);
+    if (name === 'all') {
+      const { uninstallAll } = await import('@/scripts/install.js');
+      await uninstallAll();
+    } else {
+      const { uninstallApp } = await import('@/scripts/install.js');
+      await uninstallApp(name);
+    }
     break;
   }
   case 'desktop': {
@@ -84,9 +91,9 @@ switch (command) {
     break;
   }
   case 'all': {
-    const { buildAppImages } = await import('@/builder/build.js');
+    const { buildAllApps } = await import('@/builder/build.js');
     const { generateDesktopEntries } = await import('@/scripts/desktop-entries.js');
-    await buildAppImages();
+    await buildAllApps();
     await generateDesktopEntries();
     break;
   }

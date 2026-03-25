@@ -12,7 +12,7 @@ tasks:
         description: Compile TypeScript source to JavaScript
         environment: dev
         cmds:
-            - tsc && tsc-alias
+            - npx tsc && npx tsc-alias
 
     dev:clean:
         name: Clean dist

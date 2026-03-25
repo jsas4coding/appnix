@@ -4,9 +4,8 @@ import path from 'node:path';
 
 import { beforeAll, describe, expect, it } from 'vitest';
 
-import { buildAppImages } from '@/builder/build';
+import { buildAllApps } from '@/builder/build';
 import { generateDesktopEntries } from '@/scripts/desktop-entries';
-import { installAll } from '@/scripts/install';
 
 const FIXTURES_DIR = '/fixtures';
 const CONFIG_SRC = path.join(FIXTURES_DIR, 'config.yml');
@@ -27,23 +26,24 @@ describe('AppNix E2E – Full Flow', () => {
   });
 
   it('should build, install and generate desktop entries for Google and Wikipedia', async () => {
-    await buildAppImages();
-
-    installAll();
-
+    await buildAllApps();
     await generateDesktopEntries();
 
     const apps = ['google', 'wikipedia'];
     for (const app of apps) {
-      const appImagePath = path.join('/.local/appnix', app, `${app}.AppImage`);
+      const debPackagePath = path.join(
+        os.homedir(),
+        '.config/appnix/packages',
+        `appnix-${app}.deb`,
+      );
       const desktopEntryPath = path.join(
         os.homedir(),
         '.local/share/applications',
         `${app}.desktop`,
       );
 
-      const stat = await fs.stat(appImagePath);
-      expect(stat.mode & 0o777).toBe(0o755);
+      const stat = await fs.stat(debPackagePath);
+      expect(stat.isFile()).toBe(true);
 
       const desktopContent = await fs.readFile(desktopEntryPath, 'utf8');
       expect(desktopContent).toContain(`Name=${app.charAt(0).toUpperCase() + app.slice(1)}`);

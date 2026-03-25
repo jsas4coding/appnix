@@ -5,7 +5,7 @@ import type { MockInstance } from 'vitest';
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 
 import type { AppConfig } from '@/types/config';
-import { getAppsPath, getDesktopEntriesPath } from '@/utils/config';
+import { getDesktopEntriesPath, getStagingPath } from '@/utils/config';
 import { generateElectronApp, renderTemplate } from '@/utils/template';
 
 describe('Template Utility', () => {
@@ -16,13 +16,13 @@ describe('Template Utility', () => {
     category: 'Utility',
     description: 'A test application',
     icon: '/path/to/icon.png',
-    window: { width: 1024, height: 768 },
   };
 
   const mockDefaults: AppConfig['defaults'] = {
     electron_version: '24.0.0',
     lang: 'en-US',
     spellcheck: ['en-US'],
+    maintainer: 'Test User <test@example.com>',
   };
 
   let mockConsoleError: MockInstance;
@@ -60,8 +60,7 @@ describe('Template Utility', () => {
   });
 
   it('should generate Electron app files and write them to correct locations', async () => {
-    const mockReadFile = vi
-      .spyOn(fs, 'readFile')
+    vi.spyOn(fs, 'readFile')
       .mockResolvedValueOnce('Main script for {{app_name}}')
       .mockResolvedValueOnce('Package config for {{app_name}}')
       .mockResolvedValueOnce('Desktop entry for {{app_name}}');
@@ -73,14 +72,13 @@ describe('Template Utility', () => {
 
     await generateElectronApp(mockApp, mockDefaults);
 
-    expect(mockReadFile).toHaveBeenCalled();
     expect(mockWriteFile).toHaveBeenCalledWith(
-      path.join(getAppsPath(), mockApp.app_name, 'main.js'),
+      path.join(getStagingPath(), mockApp.app_name, 'main.js'),
       expect.any(String),
       expect.any(Object),
     );
     expect(mockWriteFile).toHaveBeenCalledWith(
-      path.join(getAppsPath(), mockApp.app_name, 'package.json'),
+      path.join(getStagingPath(), mockApp.app_name, 'package.json'),
       expect.any(String),
       expect.any(Object),
     );
@@ -90,8 +88,7 @@ describe('Template Utility', () => {
       expect.any(Object),
     );
     expect(mockConsoleLog).toHaveBeenCalledWith(
-      expect.stringContaining('Generated Electron app files for:'),
-      mockApp.name,
+      expect.stringContaining('Generated Electron app files for: Test App'),
     );
   });
 
