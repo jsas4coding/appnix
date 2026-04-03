@@ -1,5 +1,6 @@
 import { execSync } from 'node:child_process';
 import fs from 'node:fs/promises';
+import os from 'node:os';
 import path from 'node:path';
 
 import { getDesktopEntriesPath, getLegacyBinPath, getPackagesPath } from '@/utils/config.js';
@@ -64,6 +65,9 @@ export async function uninstallApp(appName: string): Promise<void> {
     await safeUnlink(app.paths.desktop, 'Desktop entry');
   }
 
+  // Remove Electron user data (~/.config/{app_name}/)
+  await cleanElectronData(app.app_name);
+
   // Note: icons in ~/.config/appnix/icons/ are source assets — never delete them
 
   console.log(`${app.name} uninstalled.`);
@@ -100,6 +104,9 @@ export async function uninstallAll(): Promise<void> {
       if (app.paths.desktop) {
         await safeUnlink(app.paths.desktop, 'Desktop entry');
       }
+
+      // Remove Electron user data
+      await cleanElectronData(app.app_name);
     }
 
     // Clear registry
@@ -208,6 +215,19 @@ async function cleanOrphanedDesktopEntries(): Promise<void> {
         console.log(`  Removed desktop entry: ${filePath}`);
       }
     }
+  } catch {
+    // Directory doesn't exist
+  }
+}
+
+/**
+ * Removes Electron user data directory (~/.config/{app_name}/).
+ */
+async function cleanElectronData(appName: string): Promise<void> {
+  const dataDir = path.join(os.homedir(), '.config', appName);
+  try {
+    await fs.rm(dataDir, { recursive: true, force: true });
+    console.log(`  Removed Electron data: ${dataDir}`);
   } catch {
     // Directory doesn't exist
   }
