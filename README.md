@@ -1,14 +1,15 @@
 # AppNix
 
-Personal tool to convert websites into Linux desktop apps (.deb).
+Personal tool to convert websites into Linux desktop apps (.rpm).
 
-Define your apps in YAML, and AppNix generates Electron wrappers, builds `.deb` packages, and creates `.desktop` entries for seamless OS integration.
+Define your apps in YAML, and AppNix generates Electron wrappers, builds `.rpm` packages, and creates `.desktop` entries for seamless OS integration.
 
 ## Requirements
 
 - Node.js >= 24.0.0
-- Linux operating system
-- `dpkg` — install and manage `.deb` packages
+- Fedora (or any RPM-based Linux distribution)
+- `dnf` — install and manage `.rpm` packages
+- `rpm-build` — provides `rpmbuild` for package assembly (`sudo dnf install rpm-build`)
 
 ## Quick Start
 

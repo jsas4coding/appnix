@@ -1,12 +1,12 @@
 import { execSync } from 'node:child_process';
 
-const REQUIRED_TOOLS = ['dpkg', 'fakeroot'] as const;
+const REQUIRED_TOOLS = ['rpmbuild', 'dnf'] as const;
 
 /**
- * Ensures required system tools for building .deb packages are available.
+ * Ensures required system tools for building .rpm packages are available.
  * Throws if any dependency is missing.
  */
-export async function ensureDebDependencies(): Promise<void> {
+export async function ensureRpmDependencies(): Promise<void> {
   const missing: string[] = [];
 
   for (const tool of REQUIRED_TOOLS) {
@@ -17,7 +17,7 @@ export async function ensureDebDependencies(): Promise<void> {
 
   if (missing.length > 0) {
     throw new Error(
-      `Missing required tools: ${missing.join(', ')}.\nInstall with: sudo apt install ${missing.join(' ')}`,
+      `Missing required tools: ${missing.join(', ')}.\nInstall with: sudo dnf install rpm-build dnf`,
     );
   }
 

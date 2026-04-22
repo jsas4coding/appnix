@@ -2,7 +2,7 @@
   "$schema": "http://json-schema.org/draft-07/schema#",
   "$id": "https://raw.githubusercontent.com/jsas4coding/appnix/refs/heads/main/config.schema.json",
   "title": "AppNix Configuration",
-  "description": "Schema for AppNix config.yml — defines defaults and app entries for building Electron .deb packages.",
+  "description": "Schema for AppNix config.yml — defines defaults and app entries for building Electron .rpm packages.",
   "type": "object",
   "required": ["defaults", "apps"],
   "additionalProperties": false,
@@ -27,7 +27,7 @@
         },
         "maintainer": {
           "type": "string",
-          "description": "Package maintainer in 'Name <email>' format for .deb metadata.",
+          "description": "Package maintainer in 'Name <email>' format for .rpm metadata.",
           "pattern": "^.+ <.+@.+>$",
           "examples": ["Odara Development <hi@odara.dev>"]
         },
@@ -46,7 +46,7 @@
     },
     "apps": {
       "type": "array",
-      "description": "List of web apps to package as Electron .deb applications.",
+      "description": "List of web apps to package as Electron .rpm applications.",
       "minItems": 1,
       "items": {
         "type": "object",

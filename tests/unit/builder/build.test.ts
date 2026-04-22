@@ -18,7 +18,7 @@ vi.mock('node:child_process', () => ({
   execSync: vi.fn(),
 }));
 
-describe('Deb Build Process', () => {
+describe('Rpm Build Process', () => {
   const mockConfig = {
     defaults: {
       electron_version: '24.0.0',
@@ -45,7 +45,7 @@ describe('Deb Build Process', () => {
     vi.clearAllMocks();
     mockConsoleError = vi.spyOn(console, 'error').mockImplementation(() => undefined);
     mockConsoleLog = vi.spyOn(console, 'log').mockImplementation(() => undefined);
-    vi.spyOn(setupUtils, 'ensureDebDependencies').mockResolvedValue(undefined);
+    vi.spyOn(setupUtils, 'ensureRpmDependencies').mockResolvedValue(undefined);
     vi.spyOn(configUtils, 'loadConfig').mockResolvedValue(mockConfig as any);
     vi.spyOn(configUtils, 'validateConfig').mockReturnValue(true);
     vi.spyOn(fs, 'mkdir').mockResolvedValue(undefined as any);
@@ -53,7 +53,7 @@ describe('Deb Build Process', () => {
     vi.spyOn(fs, 'copyFile').mockResolvedValue(undefined as any);
     vi.spyOn(fs, 'access').mockRejectedValue(new Error('not found'));
     vi.spyOn(fs, 'readdir').mockResolvedValue([
-      { name: 'test-app.deb', isFile: () => true, isDirectory: () => false },
+      { name: 'test-app.rpm', isFile: () => true, isDirectory: () => false },
     ] as any);
     vi.spyOn(templateUtils, 'generateElectronApp').mockResolvedValue(undefined as any);
     vi.spyOn(installedUtils, 'registerApp').mockResolvedValue(undefined as any);
@@ -65,10 +65,10 @@ describe('Deb Build Process', () => {
     mockConsoleLog.mockRestore();
   });
 
-  it('should build .deb packages for all configured apps', async () => {
+  it('should build .rpm packages for all configured apps', async () => {
     await buildAllApps();
 
-    expect(setupUtils.ensureDebDependencies).toHaveBeenCalled();
+    expect(setupUtils.ensureRpmDependencies).toHaveBeenCalled();
     expect(configUtils.loadConfig).toHaveBeenCalled();
     expect(configUtils.validateConfig).toHaveBeenCalledWith(mockConfig);
     expect(templateUtils.generateElectronApp).toHaveBeenCalledWith(
@@ -80,14 +80,14 @@ describe('Deb Build Process', () => {
         config: expect.objectContaining({
           appId: 'com.appnix.test-app',
           productName: 'Test App',
-          deb: { packageName: 'appnix-test-app', maintainer: 'Test User <test@example.com>' },
+          rpm: { packageName: 'appnix-test-app', maintainer: 'Test User <test@example.com>' },
         }),
-        linux: ['deb'],
+        linux: ['rpm'],
       }),
     );
   });
 
-  it('should build .deb packages for multiple apps', async () => {
+  it('should build .rpm packages for multiple apps', async () => {
     const multiConfig = {
       ...mockConfig,
       apps: [

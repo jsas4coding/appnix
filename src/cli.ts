@@ -7,12 +7,12 @@ const [command, ...args] = positionals;
 
 function showHelp(): void {
   console.log(`
-AppNix — Convert websites to Linux desktop apps (.deb)
+AppNix — Convert websites to Linux desktop apps (.rpm)
 
 Usage: appnix <command> [options]
 
 Commands:
-  build              Build .deb packages for all configured apps
+  build              Build .rpm packages for all configured apps
   install <name>     Build and install a single app
   reinstall <name>   Uninstall and rebuild an app
   list               List installed apps

@@ -16,16 +16,16 @@ import {
 } from '@/utils/config.js';
 import { registerApp } from '@/utils/installed.js';
 import { generateElectronApp } from '@/utils/template.js';
-import { ensureDebDependencies } from './setup.js';
+import { ensureRpmDependencies } from './setup.js';
 
 /**
- * Builds and installs a single app as a .deb package.
+ * Builds and installs a single app as a .rpm package.
  *
- * 1. Generate Electron files in staging (~/.config/appnix/.build/{app_name})
+ * 1. Generate Electron files in staging (~/.cache/appnix/build/{app_name})
  * 2. Install dependencies in staging
- * 3. Build .deb via electron-builder (output to staging)
- * 4. Install .deb via dpkg -i
- * 5. Copy .deb to ~/.config/appnix/packages/ for reference
+ * 3. Build .rpm via electron-builder (output to staging)
+ * 4. Install .rpm via dnf install
+ * 5. Copy .rpm to ~/.cache/appnix/packages/ for reference
  * 6. Register in installed.json
  * 7. Clean up staging for this app
  */
@@ -41,7 +41,7 @@ export async function buildSingleApp(
   await fs.mkdir(packagesPath, { recursive: true });
   await fs.mkdir(iconsPath, { recursive: true });
 
-  const debPackageName = `appnix-${app.app_name}`;
+  const rpmPackageName = `appnix-${app.app_name}`;
 
   console.log(`\n── Building ${app.name} ──`);
 
@@ -55,7 +55,7 @@ export async function buildSingleApp(
   console.log(`Installing dependencies...`);
   execSync('npm install --ignore-scripts', { cwd: appStagingDir, stdio: 'inherit' });
 
-  // 3. Build .deb via electron-builder
+  // 3. Build .rpm via electron-builder
   const buildConfig: Configuration = {
     appId: `com.appnix.${app.app_name}`,
     productName: app.name,
@@ -65,13 +65,13 @@ export async function buildSingleApp(
       app: appStagingDir,
     },
     linux: {
-      target: ['deb'],
+      target: ['rpm'],
       category: app.category,
       icon: path.join(getIconsPath(), `${app.icon}.png`),
       packageCategory: app.category,
     },
-    deb: {
-      packageName: debPackageName,
+    rpm: {
+      packageName: rpmPackageName,
       maintainer: defaults.maintainer,
     },
     files: ['**/*', '!**/*.ts', '!tsconfig.json', '!package-lock.json'],
@@ -79,21 +79,21 @@ export async function buildSingleApp(
 
   await build({
     config: buildConfig,
-    linux: ['deb'],
+    linux: ['rpm'],
   });
 
-  // 4. Find and install .deb
-  const debFile = await findDebPackage(buildOutputDir);
-  if (!debFile) {
-    throw new Error(`.deb package not found in build output for ${app.name}`);
+  // 4. Find and install .rpm
+  const rpmFile = await findRpmPackage(buildOutputDir);
+  if (!rpmFile) {
+    throw new Error(`.rpm package not found in build output for ${app.name}`);
   }
 
-  console.log(`Installing ${app.name} via dpkg...`);
-  execSync(`sudo dpkg -i "${debFile}"`, { stdio: 'inherit' });
+  console.log(`Installing ${app.name} via dnf...`);
+  execSync(`sudo dnf install -y "${rpmFile}"`, { stdio: 'inherit' });
 
-  // 5. Copy .deb to packages/ for reference
-  const savedDebPath = path.join(packagesPath, `${debPackageName}.deb`);
-  await fs.copyFile(debFile, savedDebPath);
+  // 5. Copy .rpm to packages/ for reference
+  const savedRpmPath = path.join(packagesPath, `${rpmPackageName}.rpm`);
+  await fs.copyFile(rpmFile, savedRpmPath);
 
   // 6. Register in installed.json
   const binPath = `/opt/${app.name}/${app.app_name}`;
@@ -107,7 +107,7 @@ export async function buildSingleApp(
     url: app.url,
     category: app.category || '',
     description: app.description || '',
-    debPackage: debPackageName,
+    rpmPackage: rpmPackageName,
     paths: {
       bin: binPath,
       desktop: desktopEntryPath,
@@ -123,11 +123,11 @@ export async function buildSingleApp(
 }
 
 /**
- * Builds .deb packages for all configured apps.
+ * Builds .rpm packages for all configured apps.
  */
 export async function buildAllApps() {
   try {
-    await ensureDebDependencies();
+    await ensureRpmDependencies();
 
     const config = await loadConfig();
     if (!validateConfig(config)) {
@@ -138,7 +138,7 @@ export async function buildAllApps() {
       await buildSingleApp(app, config.defaults);
     }
 
-    // Final cleanup: remove .build directory
+    // Final cleanup: remove staging directory
     await fs.rm(getStagingPath(), { recursive: true, force: true });
     console.log('\nAll apps built and installed successfully.');
   } catch (error) {
@@ -167,7 +167,7 @@ export async function buildAppByName(appName: string): Promise<void> {
   }
 
   try {
-    await ensureDebDependencies();
+    await ensureRpmDependencies();
     await buildSingleApp(app, config.defaults);
 
     // Cleanup staging
@@ -181,17 +181,17 @@ export async function buildAppByName(appName: string): Promise<void> {
 }
 
 /**
- * Finds the first .deb file in a directory (recursively).
+ * Finds the first .rpm file in a directory (recursively).
  */
-async function findDebPackage(dir: string): Promise<string | null> {
+async function findRpmPackage(dir: string): Promise<string | null> {
   const entries = await fs.readdir(dir, { withFileTypes: true });
   for (const entry of entries) {
     const fullPath = path.join(dir, entry.name);
-    if (entry.isFile() && entry.name.endsWith('.deb')) {
+    if (entry.isFile() && entry.name.endsWith('.rpm')) {
       return fullPath;
     }
     if (entry.isDirectory()) {
-      const found = await findDebPackage(fullPath);
+      const found = await findRpmPackage(fullPath);
       if (found) {
         return found;
       }

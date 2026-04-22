@@ -2,7 +2,7 @@
 tasks:
     dev:setup:
         name: Setup CLI
-        description: Compile TypeScript and install AppNix CLI to ~/.config/appnix
+        description: Compile TypeScript and install AppNix CLI to ~/.local/share/appnix
         environment: dev
         deps:
             - npm:dev:compile
@@ -11,7 +11,7 @@ tasks:
 
     dev:build:
         name: Build all apps
-        description: Build .deb packages for all configured apps
+        description: Build .rpm packages for all configured apps
         environment: dev
         cmds:
             - appnix build
@@ -32,7 +32,7 @@ tasks:
 
     dev:uninstall:
         name: Uninstall app
-        description: Remove an installed app and its .deb package
+        description: Remove an installed app and its .rpm package
         environment: dev
         cmds:
             - appnix uninstall {{.CLI_ARGS}}

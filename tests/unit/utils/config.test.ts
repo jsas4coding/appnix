@@ -85,7 +85,7 @@ describe('Configuration Utility', () => {
 
   it('should load configuration using default path (detected by getConfigFile)', async () => {
     const defaultPath = getConfigFile();
-    expect(defaultPath).toContain('.config/appnix/config.yml');
+    expect(defaultPath.endsWith('.config/appnix/config.yml')).toBe(true);
   });
 
   it('should load configuration using default path without parameters', async () => {

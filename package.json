@@ -1,7 +1,7 @@
 {
   "name": "appnix",
-  "version": "1.0.1",
-  "description": "Convert websites to Linux desktop apps (.deb)",
+  "version": "2.0.0",
+  "description": "Convert websites to Linux desktop apps (.rpm)",
   "type": "module",
   "engines": {
     "node": ">=24.0.0"

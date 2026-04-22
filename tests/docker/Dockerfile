@@ -1,15 +1,14 @@
-FROM ubuntu:22.04
+FROM fedora:41
 
-ENV DEBIAN_FRONTEND=noninteractive
-
-# Basic dependencies
-RUN apt-get update && apt-get install -y \
-    curl git jq build-essential \
-    libx11-dev libxkbfile-dev libsecret-1-dev \
-    fakeroot rpm \
+# Basic dependencies for building .rpm packages and running Electron
+RUN dnf install -y \
+    curl git jq \
+    gcc gcc-c++ make \
+    libX11-devel libxkbfile-devel libsecret-devel \
+    rpm-build dnf-plugins-core \
     desktop-file-utils xdg-utils \
-    sudo \
-    && rm -rf /var/lib/apt/lists/*
+    sudo which procps-ng \
+    && dnf clean all
 
 # Create non-root user
 RUN useradd -ms /bin/bash appnix && \
@@ -27,12 +26,12 @@ ENV PATH=$HOME/nvm:$PATH
 
 # Copy and run NVM/Node installer (handles symlink and PATH setup internally)
 COPY --chown=appnix:appnix tests/docker/scripts/nvm.sh /nvm.sh
-RUN chmod +x /nvm.sh && /nvm.sh 22
+RUN chmod +x /nvm.sh && /nvm.sh 24
 
 # Prepare application directory
 WORKDIR /home/appnix/app
 
-RUN . $HOME/.bashrc
+RUN . $HOME/.bashrc || true
 
 # Debug: Check Node and NPM versions
 RUN node -v && npm -v
@@ -46,4 +45,3 @@ COPY --chown=appnix:appnix tests/docker/icons /fixtures/icons
 RUN npm install
 
 CMD ["/bin/bash"]
-

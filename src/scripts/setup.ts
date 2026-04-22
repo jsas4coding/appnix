@@ -5,7 +5,7 @@ import path from 'node:path';
 import { getLibPath, getPackagesPath } from '@/utils/config.js';
 
 /**
- * Installs the AppNix CLI by copying compiled files to ~/.config/appnix/lib/
+ * Installs the AppNix CLI by copying compiled files to ~/.local/share/appnix/lib/
  * and creating a symlink at /workspace/bin/appnix.
  */
 export async function setupCli(): Promise<void> {

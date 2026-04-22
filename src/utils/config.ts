@@ -10,35 +10,38 @@ const TEST_BASE = path.join(process.cwd(), 'tests/build');
 const IS_TEST = process.env.APPNIX_ENV === 'test';
 const BASE_PATH = IS_TEST ? TEST_BASE : HOME;
 
-const APPNIX_DIR = path.join(BASE_PATH, '.config', 'appnix');
+// XDG Base Directory paths
+const CONFIG_DIR = path.join(BASE_PATH, '.config', 'appnix');
+const DATA_DIR = path.join(BASE_PATH, '.local', 'share', 'appnix');
+const CACHE_DIR = path.join(BASE_PATH, '.cache', 'appnix');
 
 /**
- * Returns the base AppNix config directory (~/.config/appnix).
+ * Returns the AppNix config directory (~/.config/appnix).
  */
 export function getAppnixDir(): string {
-  return APPNIX_DIR;
+  return CONFIG_DIR;
 }
 
 /**
  * Returns the full path to the configuration YAML file.
  */
 export function getConfigFile(): string {
-  return path.join(APPNIX_DIR, 'config.yml');
+  return path.join(CONFIG_DIR, 'config.yml');
 }
 
 /**
- * Returns the path for temporary build staging (~/.config/appnix/.build).
+ * Returns the path for temporary build staging (~/.cache/appnix/build).
  * Cleaned up after each build.
  */
 export function getStagingPath(): string {
-  return path.join(APPNIX_DIR, '.build');
+  return path.join(CACHE_DIR, 'build');
 }
 
 /**
- * Returns the path where built .deb packages are stored (~/.config/appnix/packages).
+ * Returns the path where built .rpm packages are stored (~/.cache/appnix/packages).
  */
 export function getPackagesPath(): string {
-  return path.join(APPNIX_DIR, 'packages');
+  return path.join(CACHE_DIR, 'packages');
 }
 
 /**
@@ -46,28 +49,28 @@ export function getPackagesPath(): string {
  * Used only for cleanup during migration.
  */
 export function getLegacyBinPath(): string {
-  return path.join(APPNIX_DIR, 'bin');
+  return path.join(CONFIG_DIR, 'bin');
 }
 
 /**
  * Returns the path where app icons are stored (~/.config/appnix/icons).
  */
 export function getIconsPath(): string {
-  return path.join(APPNIX_DIR, 'icons');
+  return path.join(CONFIG_DIR, 'icons');
 }
 
 /**
  * Returns the path to installed.json (~/.config/appnix/installed.json).
  */
 export function getInstalledPath(): string {
-  return path.join(APPNIX_DIR, 'installed.json');
+  return path.join(CONFIG_DIR, 'installed.json');
 }
 
 /**
- * Returns the path to the lib directory (~/.config/appnix/lib).
+ * Returns the path to the lib directory (~/.local/share/appnix/lib).
  */
 export function getLibPath(): string {
-  return path.join(APPNIX_DIR, 'lib');
+  return path.join(DATA_DIR, 'lib');
 }
 
 /**
@@ -78,7 +81,7 @@ export function getTemplatesPath(): string {
   if (IS_TEST) {
     return path.join(process.cwd(), 'src', 'templates');
   }
-  return path.join(APPNIX_DIR, 'lib', 'templates');
+  return path.join(DATA_DIR, 'lib', 'templates');
 }
 
 /**

@@ -8,9 +8,10 @@ import { generateDesktopEntries } from '@/scripts/desktop-entries';
 const FIXTURES_DIR = '/fixtures';
 const CONFIG_SRC = path.join(FIXTURES_DIR, 'config.yml');
 const ICONS_SRC = path.join(FIXTURES_DIR, 'icons');
-const CONFIG_TARGET_DIR = path.join(os.homedir(), '.config', 'appnix');
-const CONFIG_TARGET = path.join(CONFIG_TARGET_DIR, 'config.yml');
-const ICONS_TARGET = path.join(CONFIG_TARGET_DIR, 'icons');
+const CONFIG_DIR = path.join(os.homedir(), '.config', 'appnix');
+const CACHE_DIR = path.join(os.homedir(), '.cache', 'appnix');
+const CONFIG_TARGET = path.join(CONFIG_DIR, 'config.yml');
+const ICONS_TARGET = path.join(CONFIG_DIR, 'icons');
 describe('AppNix E2E – Full Flow', () => {
   beforeAll(async () => {
     await fs.mkdir(ICONS_TARGET, { recursive: true });
@@ -25,12 +26,8 @@ describe('AppNix E2E – Full Flow', () => {
     await generateDesktopEntries();
     const apps = ['google', 'wikipedia'];
     for (const app of apps) {
-      const debPackagePath = path.join(
-        os.homedir(),
-        '.config/appnix/packages',
-        `appnix-${app}.deb`,
-      );
-      const stat = await fs.stat(debPackagePath);
+      const rpmPackagePath = path.join(CACHE_DIR, 'packages', `appnix-${app}.rpm`);
+      const stat = await fs.stat(rpmPackagePath);
       expect(stat.isFile()).toBe(true);
 
       const desktopEntryPath = path.join(

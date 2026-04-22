@@ -25,7 +25,7 @@ describe('AppNix Install/Uninstall', () => {
       url: 'https://example.com',
       category: 'Utility',
       description: 'A test application',
-      debPackage: 'appnix-test-app',
+      rpmPackage: 'appnix-test-app',
       paths: {
         bin: '/opt/Test App/test-app',
         desktop: '/home/user/.local/share/applications/test-app.desktop',
@@ -47,7 +47,7 @@ describe('AppNix Install/Uninstall', () => {
   });
 
   describe('listInstalled', () => {
-    it('should list installed apps with deb package info', async () => {
+    it('should list installed apps with rpm package info', async () => {
       vi.spyOn(installedUtils, 'readInstalled').mockResolvedValue(mockRegistry);
       await listInstalled();
       expect(mockConsoleLog).toHaveBeenCalledWith(expect.stringContaining('Test App'));
@@ -62,11 +62,11 @@ describe('AppNix Install/Uninstall', () => {
   });
 
   describe('uninstallApp', () => {
-    it('should uninstall app via dpkg -r', async () => {
+    it('should uninstall app via dnf remove', async () => {
       vi.spyOn(installedUtils, 'unregisterApp').mockResolvedValue(mockRegistry['test-app']);
       const { execSync } = await import('node:child_process');
       await uninstallApp('test-app');
-      expect(execSync).toHaveBeenCalledWith('sudo dpkg -r "appnix-test-app"', {
+      expect(execSync).toHaveBeenCalledWith('sudo dnf remove -y "appnix-test-app"', {
         stdio: 'inherit',
       });
       expect(mockConsoleLog).toHaveBeenCalledWith('Test App uninstalled.');

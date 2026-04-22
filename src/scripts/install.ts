@@ -22,14 +22,14 @@ export async function listInstalled(): Promise<void> {
   for (const app of apps) {
     console.log(`  ${app.name} (${app.app_name})`);
     console.log(`    URL:     ${app.url}`);
-    console.log(`    Package: ${app.debPackage}`);
+    console.log(`    Package: ${app.rpmPackage}`);
     console.log(`    Binary:  ${app.paths.bin}`);
     console.log(`    Since:   ${app.installedAt}\n`);
   }
 }
 
 /**
- * Uninstalls an app by name using dpkg -r and removes its .deb package.
+ * Uninstalls an app by name using dnf remove and removes its .rpm package.
  */
 export async function uninstallApp(appName: string): Promise<void> {
   const app = await unregisterApp(appName);
@@ -41,18 +41,18 @@ export async function uninstallApp(appName: string): Promise<void> {
 
   console.log(`Uninstalling ${app.name}...`);
 
-  // Remove via dpkg (new .deb model)
-  if (app.debPackage) {
+  // Remove via dnf
+  if (app.rpmPackage) {
     try {
-      execSync(`sudo dpkg -r "${app.debPackage}"`, { stdio: 'inherit' });
-      console.log(`  Removed package: ${app.debPackage}`);
+      execSync(`sudo dnf remove -y "${app.rpmPackage}"`, { stdio: 'inherit' });
+      console.log(`  Removed package: ${app.rpmPackage}`);
     } catch {
-      console.error(`  Failed to remove package: ${app.debPackage}`);
+      console.error(`  Failed to remove package: ${app.rpmPackage}`);
     }
 
-    // Remove saved .deb file
-    const debPath = path.join(getPackagesPath(), `${app.debPackage}.deb`);
-    await safeUnlink(debPath, 'Package file');
+    // Remove saved .rpm file
+    const rpmPath = path.join(getPackagesPath(), `${app.rpmPackage}.rpm`);
+    await safeUnlink(rpmPath, 'Package file');
   }
 
   // Remove legacy AppImage binary (old model)
@@ -74,7 +74,7 @@ export async function uninstallApp(appName: string): Promise<void> {
 }
 
 /**
- * Uninstalls all apps (both .deb and legacy AppImage) and cleans up all artifacts.
+ * Uninstalls all apps and cleans up all artifacts.
  */
 export async function uninstallAll(): Promise<void> {
   const registry = await readInstalled();
@@ -85,13 +85,13 @@ export async function uninstallAll(): Promise<void> {
     for (const app of apps) {
       console.log(`\n── ${app.name} ──`);
 
-      // Remove .deb package
-      if (app.debPackage) {
+      // Remove .rpm package
+      if (app.rpmPackage) {
         try {
-          execSync(`sudo dpkg -r "${app.debPackage}"`, { stdio: 'inherit' });
-          console.log(`  Removed package: ${app.debPackage}`);
+          execSync(`sudo dnf remove -y "${app.rpmPackage}"`, { stdio: 'inherit' });
+          console.log(`  Removed package: ${app.rpmPackage}`);
         } catch {
-          console.error(`  Failed to remove package: ${app.debPackage}`);
+          console.error(`  Failed to remove package: ${app.rpmPackage}`);
         }
       }
 
@@ -115,13 +115,13 @@ export async function uninstallAll(): Promise<void> {
     console.log('No registered apps found.');
   }
 
-  // Remove any appnix-* deb packages still in dpkg (catches orphans not in registry)
-  await cleanOrphanedDebPackages();
+  // Remove any appnix-* rpm packages still installed (catches orphans not in registry)
+  await cleanOrphanedRpmPackages();
 
-  // Clean up legacy AppImage binaries (~/.config/appnix/bin/)
+  // Clean up legacy AppImage binaries (~/.config/appnix/bin/ — kept in config for migration)
   await cleanLegacyBinDir();
 
-  // Clean up .deb packages (~/.config/appnix/packages/)
+  // Clean up .rpm packages (~/.cache/appnix/packages/)
   await cleanDir(getPackagesPath(), 'packages');
 
   // Clean up orphaned desktop entries
@@ -131,26 +131,26 @@ export async function uninstallAll(): Promise<void> {
 }
 
 /**
- * Finds and removes any appnix-* packages still installed via dpkg
+ * Finds and removes any appnix-* packages still installed via rpm
  * that were not in the registry (orphaned packages).
  */
-async function cleanOrphanedDebPackages(): Promise<void> {
+async function cleanOrphanedRpmPackages(): Promise<void> {
   try {
-    const output = execSync('dpkg -l | grep "^ii  appnix-"', {
+    const output = execSync('rpm -qa --qf "%{NAME}\\n" "appnix-*"', {
       encoding: 'utf8',
       stdio: ['pipe', 'pipe', 'ignore'],
     });
     const packages = output
       .trim()
       .split('\n')
-      .map((line) => line.split(/\s+/)[1])
-      .filter(Boolean);
+      .map((line) => line.trim())
+      .filter((pkg) => pkg.startsWith('appnix-'));
 
     if (packages.length > 0) {
-      console.log(`\nRemoving ${packages.length} orphaned deb package(s)...`);
+      console.log(`\nRemoving ${packages.length} orphaned rpm package(s)...`);
       for (const pkg of packages) {
         try {
-          execSync(`sudo dpkg -r "${pkg}"`, { stdio: 'inherit' });
+          execSync(`sudo dnf remove -y "${pkg}"`, { stdio: 'inherit' });
           console.log(`  Removed orphaned package: ${pkg}`);
         } catch {
           console.error(`  Failed to remove: ${pkg}`);
@@ -158,7 +158,7 @@ async function cleanOrphanedDebPackages(): Promise<void> {
       }
     }
   } catch {
-    // No appnix packages found in dpkg
+    // No appnix packages found in rpm database
   }
 }
 

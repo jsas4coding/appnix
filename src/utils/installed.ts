@@ -8,7 +8,7 @@ export interface InstalledApp {
   url: string;
   category: string;
   description: string;
-  debPackage: string;
+  rpmPackage: string;
   paths: {
     bin: string;
     desktop: string;

@@ -13,7 +13,7 @@ import { renderTemplate } from '@/utils/template.js';
 /**
  * Generates and installs desktop entries for all configured applications.
  *
- * The .deb package already includes desktop entries, but this command
+ * The .rpm package already includes desktop entries, but this command
  * can be used to regenerate them manually if needed.
  */
 export async function generateDesktopEntries(): Promise<void> {

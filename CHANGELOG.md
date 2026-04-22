@@ -4,6 +4,22 @@ All notable changes to this project will be documented in this file.
 
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
 
+## [2.0.0] - 2026-04-11
+
+### Changed
+
+- **Package format** — migrated from Debian `.deb` to Fedora `.rpm`. Clean break — Debian/Ubuntu is no longer supported
+- **Installer** — apps are now installed via `sudo dnf install -y <pkg>.rpm` instead of `sudo dpkg -i`
+- **Uninstaller** — apps are now removed via `sudo dnf remove -y <pkg>` instead of `sudo dpkg -r`
+- **Orphan detection** — now uses `rpm -qa --qf "%{NAME}\n" "appnix-*"` instead of `dpkg -l`
+- **Build dependencies** — now requires `rpm-build` (provides `rpmbuild`) and `dnf` instead of `dpkg`/`fakeroot`
+- **XDG paths** — build staging and package cache moved from `~/.config/appnix/.build` and `~/.config/appnix/packages` to `~/.cache/appnix/build` and `~/.cache/appnix/packages`. CLI runtime moved from `~/.config/appnix/lib` to `~/.local/share/appnix/lib`
+- **Registry field** — `installed.json` renamed `debPackage` to `rpmPackage`
+
+### Removed
+
+- **Debian/Ubuntu support** — no compatibility shim; AppNix is Fedora-only from 2.0.0 onward
+
 ## [1.0.1] - 2026-04-03
 
 ### Fixed
